@@ -1,4 +1,6 @@
-# Job Search Tracker
+# Jedediah
+
+Named for Jedediah Smith (1799–1831), fur trapper and pathfinder of the American West.
 
 A local web app for tracking job applications. One executable serves a web UI on
 `127.0.0.1`, and your data lives next to it as human-readable YAML files. There is no database,
@@ -27,12 +29,12 @@ embedded in the binary, so it works offline.
 
 ## Install and run
 
-Download `tracker.exe` (or build it, see below), put it in any folder and double-click it. It
+Download `jedediah.exe` (or build it, see below), put it in any folder and double-click it. It
 creates a `data/` folder next to itself and prints the address to open:
 
 ```
-  Job Search Tracker is running at http://127.0.0.1:8765
-  Data: C:\Tools\tracker\data
+  Jedediah is running at http://127.0.0.1:8765
+  Data: C:\Tools\jedediah\data
   Press Ctrl+C to stop.
 ```
 
@@ -41,7 +43,7 @@ Flags:
 | Flag | Default | Meaning |
 |---|---|---|
 | `--addr` | `127.0.0.1:8765` | Listen address. Other interfaces only if you ask for them. |
-| `--data` | `$JST_DATA_DIR`, else `data/` next to the executable | Data directory |
+| `--data` | `$JEDEDIAH_DATA_DIR`, else `data/` next to the executable | Data directory |
 | `--open` | on | Open the browser once the server is ready; `--open=false` to skip |
 | `--demo` | off | Run on a temporary copy of built-in fake data; changes are discarded on exit |
 | `--dev` | off | Serve static files from `web/static` on disk, no caching, debug logs |
@@ -117,11 +119,11 @@ go tool task dev       # live reload; open http://127.0.0.1:8766 for browser aut
 go tool task demo      # run on the sample data
 go tool task test      # templ generate + go test ./...
 go tool task lint      # go vet
-go tool task build     # dist/tracker.exe with the version from git describe
+go tool task build     # dist/jedediah.exe with the version from git describe
 go tool task release   # cross-compile for Windows, macOS and Linux (amd64 + arm64)
 ```
 
-Generated `*_templ.go` files are committed, so plain `go build ./cmd/tracker` works without templ.
+Generated `*_templ.go` files are committed, so plain `go build ./cmd/jedediah` works without templ.
 After changing a `.templ` file, run `go tool task generate` (air and the build tasks do this for
 you).
 
@@ -129,15 +131,15 @@ Layout:
 
 | Path | What |
 |---|---|
-| `cmd/tracker` | flags, wiring, graceful shutdown, `--open` |
+| `cmd/jedediah` | flags, wiring, graceful shutdown, `--open` |
 | `internal/model` | domain types, dates, validation, events, dashboard logic (no I/O) |
 | `internal/store` | the only code that touches `data/`: load, atomic writes, trash, files |
 | `internal/web` | routes, handlers, form binding, htmx-aware rendering, security middleware |
 | `internal/views` | templ pages; `components/` (inputs, pills, Markdown) and `sections/` (the six cards) |
 | `internal/demo` | embedded fake sample data for `--demo` and tests |
-| `web/static` | `app.css`, `app.js` and the vendored htmx, SortableJS and Pico CSS (see `vendor/VERSIONS.md`) |
+| `web/static` | `app.css`, `app.js`, the Besley font (`fonts/`, SIL OFL) and the vendored htmx, SortableJS and Pico CSS (see `vendor/VERSIONS.md`) |
 
-GoLand: the shared run configurations in `.run/` give you *tracker (debug)*, *dev (live reload)* and
+GoLand: the shared run configurations in `.run/` give you *jedediah (debug)*, *dev (live reload)* and
 *tests*. Install the **templ** plugin from the Marketplace for `.templ` syntax highlighting. If
 the plugin can't find `templ`, install the version from `go.mod` with
 `go install github.com/a-h/templ/cmd/templ@v0.3.1070`.

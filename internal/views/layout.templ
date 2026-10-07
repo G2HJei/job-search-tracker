@@ -4,13 +4,13 @@ import "strconv"
 
 templ Layout(p Page) {
 	<!DOCTYPE html>
-	<html lang="en">
+	<html lang="en" data-theme="dark">
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<meta name="color-scheme" content="light dark"/>
+			<meta name="color-scheme" content="dark"/>
 			<meta name="htmx-config" content={ htmxConfig }/>
-			<title>{ p.Title } · Job Search Tracker</title>
+			<title>{ p.Title } · Jedediah</title>
 			<link rel="icon" href={ p.asset("favicon.svg") } type="image/svg+xml"/>
 			<link rel="stylesheet" href={ p.asset("vendor/pico.min.css") }/>
 			<link rel="stylesheet" href={ p.asset("css/app.css") }/>
@@ -24,7 +24,7 @@ templ Layout(p Page) {
 			<header class="topbar">
 				<nav class="container-fluid">
 					<ul>
-						<li><a href="/" class="brand"><strong>Job Search Tracker</strong></a></li>
+						<li><a href="/" class="brand">Jedediah</a></li>
 					</ul>
 					<ul class="nav-links">
 						@navLink(p, "dashboard", "/", "Dashboard")
@@ -51,6 +51,9 @@ templ Layout(p Page) {
 				}
 				{ children... }
 			</main>
+			<footer class="site-foot">
+				<p>Named for Jedediah Smith (1799–1831), trapper and pathfinder of the American West.</p>
+			</footer>
 			<div id="toasts" aria-live="polite"></div>
 		</body>
 	</html>

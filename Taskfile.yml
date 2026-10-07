@@ -21,13 +21,13 @@ tasks:
     desc: Run against ./data and open the browser
     deps: [generate]
     cmds:
-      - go run ./cmd/tracker --data ./data
+      - go run ./cmd/jedediah --data ./data
 
   demo:
     desc: Run on a temporary copy of the sample data
     deps: [generate]
     cmds:
-      - go run ./cmd/tracker --demo
+      - go run ./cmd/jedediah --demo
 
   test:
     desc: Run all tests
@@ -41,10 +41,10 @@ tasks:
       - go vet ./...
 
   build:
-    desc: Build dist/tracker(.exe) for this machine
+    desc: Build dist/jedediah(.exe) for this machine
     deps: [generate]
     cmds:
-      - go build -trimpath -ldflags "{{.LDFLAGS}}" -o dist/tracker{{exeExt}} ./cmd/tracker
+      - go build -trimpath -ldflags "{{.LDFLAGS}}" -o dist/jedediah{{exeExt}} ./cmd/jedediah
 
   release:
     desc: Cross-compile for Windows, macOS and Linux (amd64 + arm64)
@@ -61,4 +61,4 @@ tasks:
     internal: true
     env: { GOOS: '{{.OS}}', GOARCH: '{{.ARCH}}', CGO_ENABLED: '0' } # per-command env, never `go env -w`
     cmds:
-      - go build -trimpath -ldflags "{{.LDFLAGS}}" -o dist/tracker-{{.OS}}-{{.ARCH}}{{if eq .OS "windows"}}.exe{{end}} ./cmd/tracker
+      - go build -trimpath -ldflags "{{.LDFLAGS}}" -o dist/jedediah-{{.OS}}-{{.ARCH}}{{if eq .OS "windows"}}.exe{{end}} ./cmd/jedediah

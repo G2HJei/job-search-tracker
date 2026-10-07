@@ -1,30 +1,131 @@
-/* Job Search Tracker — small additions on top of Pico CSS v2. */
+/* Jedediah — small additions on top of Pico CSS v2. Dark only: the layout
+   sets data-theme="dark", and the palette below replaces Pico's. */
+
+/* Besley, a Clarendon revival (SIL OFL, see fonts/Besley.OFL.txt). */
+@font-face {
+  font-family: "Besley";
+  src: url("../fonts/Besley.ttf") format("truetype");
+  font-weight: 400 900;
+  font-display: swap;
+}
 
 :root {
-  --c-red: #d93526;
-  --c-amber: #c27c0e;
-  --c-grey: #7b8495;
-  --c-green: #398712;
-  --c-blue: #2060df;
-  --c-teal: #0f8a8a;
-  --c-purple: #8e44ad;
+  /* Trail palette */
+  --walnut: #211a14;   /* page */
+  --saddle: #2b221a;   /* cards */
+  --sunk: #1a140f;     /* wells: board columns, inputs */
+  --strap: #160f0a;    /* top bar */
+  --line: #3b3026;     /* borders */
+  --rawhide: #e6d9c2;  /* light text, stitching */
+  --dust: #a6967f;     /* muted text */
+  --brass: #d6a64f;    /* links, buttons, focus */
+
+  --c-red: #e0675a;
+  --c-amber: #d9a441;
+  --c-grey: #9b8f80;
+  --c-green: #93b874;
+  --c-blue: #7fa9cc;
+  --c-teal: #62b5a8;
+  --c-purple: #b596cc;
+  --font-display: "Besley", Rockwell, Georgia, serif;
   --pico-font-size: 95%;
   --gap: 1.25rem;
 }
 
+[data-theme=dark] {
+  --pico-background-color: var(--walnut);
+  --pico-color: #dacdb5;
+  --pico-text-selection-color: rgb(214 166 79 / 30%);
+  --pico-muted-color: var(--dust);
+  --pico-muted-border-color: var(--line);
+  --pico-primary: #e4c27f;
+  --pico-primary-background: var(--brass);
+  --pico-primary-underline: rgb(214 166 79 / 35%);
+  --pico-primary-hover: #ecc277;
+  --pico-primary-hover-background: #e4b763;
+  --pico-primary-focus: rgb(214 166 79 / 40%);
+  --pico-primary-inverse: #1d140c;
+  --pico-secondary: var(--dust);
+  --pico-secondary-background: #4a3d31;
+  --pico-secondary-underline: rgb(166 150 127 / 50%);
+  --pico-secondary-hover: #c4b49c;
+  --pico-secondary-hover-background: #5a4a3b;
+  --pico-secondary-focus: rgb(166 150 127 / 30%);
+  --pico-secondary-inverse: var(--rawhide);
+  --pico-contrast: var(--rawhide);
+  --pico-contrast-background: var(--rawhide);
+  --pico-contrast-hover: #f4ead8;
+  --pico-contrast-hover-background: #f4ead8;
+  --pico-contrast-inverse: var(--walnut);
+  --pico-h1-color: #f2e7d2;
+  --pico-h2-color: #ecdfc7;
+  --pico-h3-color: #e2d4ba;
+  --pico-h4-color: #d6c7ab;
+  --pico-h5-color: var(--dust);
+  --pico-h6-color: var(--dust);
+  --pico-mark-background-color: rgb(214 166 79 / 35%);
+  --pico-mark-color: var(--rawhide);
+  --pico-table-row-stripped-background-color: rgb(230 217 194 / 3%);
+  --pico-form-element-background-color: var(--sunk);
+  --pico-form-element-selected-background-color: #3a2e23;
+  --pico-form-element-border-color: #45382b;
+  --pico-form-element-color: var(--rawhide);
+  --pico-form-element-placeholder-color: #8a7b68;
+  --pico-form-element-active-background-color: #1e1712;
+  --pico-switch-background-color: #4a3d31;
+  --pico-card-background-color: var(--saddle);
+  --pico-card-border-color: var(--line);
+  --pico-card-box-shadow: 0 0 0 1px var(--line);
+  --pico-card-sectioning-background-color: #31271e;
+  --pico-dropdown-background-color: var(--saddle);
+  --pico-dropdown-border-color: var(--line);
+  --pico-dropdown-hover-background-color: #3a2e23;
+  --pico-progress-background-color: #3a2e23;
+  --pico-modal-overlay-background-color: rgb(22 15 10 / 80%);
+}
+
+h1, h2, h3, h4 { font-family: var(--font-display); }
+h1 { font-weight: 800; }
+h3, h4 { font-weight: 600; }
+
 /* ---- Layout ---- */
 
+/* The top bar is a leather strap with a stitched seam. */
 .topbar {
-  border-bottom: 1px solid var(--pico-muted-border-color);
-  margin-bottom: var(--gap);
+  position: relative;
+  background: var(--strap);
+  border-bottom: 1px solid #000;
+  padding-bottom: .5rem;
+  margin-bottom: calc(var(--gap) + .5rem);
+}
+.topbar::after {
+  content: ""; position: absolute; inset-inline: .75rem; bottom: .4rem; height: 1.5px;
+  background: repeating-linear-gradient(90deg, rgb(230 217 194 / 32%) 0 6px, transparent 6px 11px);
+  filter: drop-shadow(0 1px 0 #000);
+  pointer-events: none;
 }
 .topbar nav { flex-wrap: wrap; }
-.topbar .brand { color: var(--pico-color); text-decoration: none; }
-.nav-links a { padding-inline: .5rem; }
-.nav-links a[aria-current="page"] { font-weight: 600; text-decoration: underline; text-underline-offset: .35em; }
+.topbar .brand {
+  font-family: var(--font-display); font-weight: 900; font-size: 1.7rem; line-height: 1;
+  color: var(--brass); text-decoration: none;
+}
+.topbar .brand:hover { color: var(--pico-primary-hover); }
+.nav-links a { padding-inline: .5rem; color: rgb(230 217 194 / 75%); text-decoration: none; }
+.nav-links a:hover { color: var(--rawhide); }
+.nav-links a[aria-current="page"] {
+  color: var(--rawhide); font-weight: 600;
+  text-decoration: underline 2px var(--brass); text-underline-offset: .45em;
+}
 .nav-search { margin: 0; }
 .nav-search input { margin: 0; width: 13rem; height: 2.25rem; padding-block: 0; }
+.topbar .nav-search input { background-color: rgb(230 217 194 / 5%); border-color: #3a2e24; }
 .new-btn { white-space: nowrap; padding: .35rem .8rem; }
+
+.site-foot {
+  margin-top: 3rem; padding: 1.25rem 1rem 2rem; border-top: 1px solid var(--line);
+  text-align: center; color: var(--dust); font-family: var(--font-display); font-size: .85rem;
+}
+.site-foot p { margin: 0; color: inherit; }
 
 .page-head {
   display: flex; align-items: baseline; justify-content: space-between;
@@ -79,7 +180,7 @@ button.small, [role="button"].small, .small[type="submit"] {
   padding: .55rem 1rem; border-radius: var(--pico-border-radius);
   box-shadow: 0 4px 16px rgb(0 0 0 / 20%); transition: opacity .4s; font-size: .9rem;
 }
-.toast.error { background: var(--c-red); color: #fff; }
+.toast.error { background: var(--c-red); color: #1d140c; }
 .toast.hide { opacity: 0; }
 
 /* ---- Pills, ratings, unknown values ---- */
@@ -163,7 +264,7 @@ table.pipeline tr.closed th { color: var(--pico-muted-color); }
   gap: .75rem; overflow-x: auto; padding-bottom: 1rem; align-items: start;
 }
 .board-column {
-  background: color-mix(in srgb, var(--pico-muted-border-color) 35%, transparent);
+  background: var(--sunk); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 25%);
   border-radius: var(--pico-border-radius); padding: .5rem;
 }
 .board-column.closed { opacity: .8; }

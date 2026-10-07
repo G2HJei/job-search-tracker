@@ -161,7 +161,7 @@ func (s *Server) calendarICS(w http.ResponseWriter, r *http.Request) {
 	line := func(l string) { icsFold(&b, l) }
 	line("BEGIN:VCALENDAR")
 	line("VERSION:2.0")
-	line("PRODID:-//job-search-tracker//EN")
+	line("PRODID:-//Jedediah//EN")
 	line("CALSCALE:GREGORIAN")
 	line("METHOD:PUBLISH")
 	line("X-WR-CALNAME:Job search")
@@ -171,7 +171,7 @@ func (s *Server) calendarICS(w http.ResponseWriter, r *http.Request) {
 			uid += "-" + strconv.Itoa(e.N)
 		}
 		line("BEGIN:VEVENT")
-		line("UID:" + uid + "@job-search-tracker")
+		line("UID:" + uid + "@jedediah")
 		line("DTSTAMP:" + stamp)
 		if e.When.HasTime() {
 			start := e.When.Time(time.UTC)

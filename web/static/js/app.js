@@ -1,4 +1,4 @@
-// Small helpers for Job Search Tracker. Loaded as a file because the CSP
+// Small helpers for Jedediah. Loaded as a file because the CSP
 // forbids inline scripts.
 (function () {
   "use strict";

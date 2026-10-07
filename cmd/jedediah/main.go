@@ -1,4 +1,4 @@
-// Command tracker serves the Job Search Tracker web UI on 127.0.0.1 and
+// Command jedediah serves the Jedediah web UI on 127.0.0.1 and
 // stores data as YAML files in a local folder.
 package main
 
@@ -31,14 +31,14 @@ var version = "dev"
 
 func main() {
 	if err := run(); err != nil {
-		fmt.Fprintln(os.Stderr, "tracker:", err)
+		fmt.Fprintln(os.Stderr, "jedediah:", err)
 		os.Exit(1)
 	}
 }
 
 func run() error {
 	addr := flag.String("addr", "127.0.0.1:8765", "listen address")
-	dataFlag := flag.String("data", "", "data directory (default: $JST_DATA_DIR, else data/ next to the executable)")
+	dataFlag := flag.String("data", "", "data directory (default: $JEDEDIAH_DATA_DIR, else data/ next to the executable)")
 	openFlag := flag.Bool("open", true, "open the default browser once the server is ready (--open=false to skip)")
 	dev := flag.Bool("dev", false, "serve static files from disk without caching, and log debug messages")
 	demoFlag := flag.Bool("demo", false, "run on a temporary copy of the built-in sample data")
@@ -60,7 +60,7 @@ func run() error {
 	// Bind first, so a second instance fails before touching the data directory.
 	ln, err := net.Listen("tcp", *addr)
 	if err != nil {
-		return fmt.Errorf("cannot listen on %s: %w\nIs the tracker already running? Open http://%s", *addr, err, *addr)
+		return fmt.Errorf("cannot listen on %s: %w\nIs Jedediah already running? Open http://%s", *addr, err, *addr)
 	}
 	defer ln.Close()
 
@@ -89,7 +89,7 @@ func run() error {
 	httpSrv := &http.Server{Handler: srv.Handler(), ReadHeaderTimeout: 10 * time.Second}
 
 	url := "http://" + browserAddr(ln.Addr().(*net.TCPAddr))
-	fmt.Printf("\n  Job Search Tracker %s is running at %s\n  Data: %s\n  Press Ctrl+C to stop.\n\n", version, url, st.Dir())
+	fmt.Printf("\n  Jedediah %s is running at %s\n  Data: %s\n  Press Ctrl+C to stop.\n\n", version, url, st.Dir())
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -113,11 +113,11 @@ func run() error {
 }
 
 // dataDir resolves the data directory: --demo → temp copy of the sample
-// data; else --data; else $JST_DATA_DIR; else data/ next to the executable.
+// data; else --data; else $JEDEDIAH_DATA_DIR; else data/ next to the executable.
 func dataDir(flagDir string, useDemo bool, log *slog.Logger) (string, func(), error) {
 	noop := func() {}
 	if useDemo {
-		tmp, err := os.MkdirTemp("", "job-search-demo-")
+		tmp, err := os.MkdirTemp("", "jedediah-demo-")
 		if err != nil {
 			return "", noop, err
 		}
@@ -132,7 +132,7 @@ func dataDir(flagDir string, useDemo bool, log *slog.Logger) (string, func(), er
 	if flagDir != "" {
 		return flagDir, noop, nil
 	}
-	if env := os.Getenv("JST_DATA_DIR"); env != "" {
+	if env := os.Getenv("JEDEDIAH_DATA_DIR"); env != "" {
 		return env, noop, nil
 	}
 	exe, err := os.Executable()

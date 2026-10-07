@@ -5,8 +5,8 @@ tmp_dir = "tmp"
 
 [build]
   pre_cmd = ["go tool templ generate"]
-  cmd = "go build -o ./tmp/tracker.exe ./cmd/tracker"
-  entrypoint = ["./tmp/tracker.exe", "--data", "./data", "--dev", "--open=false"] # air restarts on every change
+  cmd = "go build -o ./tmp/jedediah.exe ./cmd/jedediah"
+  entrypoint = ["./tmp/jedediah.exe", "--data", "./data", "--dev", "--open=false"] # air restarts on every change
   include_ext = ["go", "templ", "css", "js"]
   exclude_dir = ["tmp", "dist", "data", "testdata", ".idea", ".playwright-mcp"]
   exclude_regex = ['_templ\.go$', '_test\.go$'] # prevents a generate → rebuild loop
