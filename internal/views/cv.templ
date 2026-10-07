@@ -1,0 +1,62 @@
+package views
+
+import "github.com/G2HJei/job-search-tracker/internal/views/components"
+
+templ CVPage(p Page, d CVData) {
+	@Layout(p) {
+		<div class="page-head">
+			<h1>CV library</h1>
+		</div>
+		<p class="muted">
+			Files in <code>data/cv/</code>. Pick one as the "CV version" of an application to see where each CV was used.
+		</p>
+		<form method="post" action="/cv" enctype="multipart/form-data" class="inline-upload">
+			if d.Error != "" {
+				<p class="form-error" role="alert">{ d.Error }</p>
+			}
+			<span role="group">
+				<input type="file" name="file" required aria-label="CV file"/>
+				<button type="submit">Upload CV</button>
+			</span>
+		</form>
+		if len(d.Files) == 0 {
+			<article class="empty-state"><p>No CVs yet.</p></article>
+		} else {
+			<div class="table-wrap">
+				<table class="striped">
+					<thead>
+						<tr>
+							<th>File</th>
+							<th>Size</th>
+							<th>Modified</th>
+							<th>Used in</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, f := range d.Files {
+							<tr>
+								<td><a href={ "/cv/" + f.Name } target="_blank">{ f.Name }</a></td>
+								<td class="nowrap">{ components.FileSize(f.Size) }</td>
+								<td class="nowrap">{ f.ModTime.Format("2 Jan 2006") }</td>
+								<td>
+									if len(f.UsedIn) == 0 {
+										<span class="muted">Not used yet</span>
+									} else {
+										<ul class="plain">
+											for _, r := range f.UsedIn {
+												<li>
+													<a href={ "/applications/" + r.App.ID }>{ r.Company } · { r.App.Job.Title }</a>
+													@components.StatusPill(&d.Config, r.App.Status)
+												</li>
+											}
+										</ul>
+									}
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		}
+	}
+}

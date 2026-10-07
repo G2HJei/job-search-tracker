@@ -1,0 +1,67 @@
+schemaVersion: 1
+id: 2026-08-05-larkspur-payments-software-engineer-fraud-platform
+createdAt: 2026-08-05T19:42:00+01:00
+updatedAt: 2026-09-05T08:15:00+01:00
+priority: medium
+status: rejected
+companyId: larkspur-payments
+job:
+  title: Software Engineer, Fraud Platform
+  postingUrl: https://larkspur-payments.example/careers/eng-0412
+  jobId: ENG-0412
+  department: Risk & Fraud
+  location: London (hybrid, 3 days)
+  keyRequirements: |
+    - 3+ years of backend experience (Go preferred)
+    - Streaming systems (Kafka or similar)
+    - Interest in ML-assisted fraud scoring
+  fit: 3
+  interest: 4
+  channel: Company website
+  cvVersion: cv-backend-v2.pdf
+  advertisedSalary: { min: 65000, max: 78000, currency: GBP, period: year }
+contacts:
+  recruiters:
+    - name: Marta Okonkwo-Reyes
+      role: Technical Recruiter
+      email: marta.okonkwo-reyes@larkspur-payments.example
+  interviewers:
+    - { name: Dev Malhotra, role: Senior Engineer (Fraud) }
+    - { name: Hannah Voss, role: Engineer }
+process:
+  lastContactDate: 2026-09-04
+  dateApplied: 2026-08-05
+  screeningDate: 2026-08-14T09:30
+  interviews:
+    - date: 2026-08-28T15:00
+      type: Technical
+      interviewers: [Dev Malhotra, Hannah Voss]
+      notes: |
+        Live coding: sliding-window rate limiter. Working solution, but ran out of time for tests.
+  qa:
+    - round: 0
+      question: Why Larkspur?
+      answer: |
+        Payments at marketplace scale, and the engineering blog shows they care about correctness.
+    - round: 1
+      question: How would you make the rate limiter work across several instances?
+      answer: |
+        Shared counter in Redis with an atomic Lua script per key and window; fall back to
+        local limits if Redis is unavailable. Didn't cover clock skew well.
+  decision: Rejected by company
+  rejectionFeedback: |
+    Recruiter call on 4 Sep:
+    - Strong communication and good system intuition.
+    - Wanted more depth on streaming (delivery semantics, consumer lag handling).
+    - Welcome to apply to other teams; she flagged the Payments Core opening.
+compensation:
+  asked: { min: 75000, currency: GBP, period: year }
+  contractType: Permanent
+  noticePeriod: 1 month
+other:
+  lessonsLearned: |
+    - Practise timed live coding and write the tests first.
+    - Revise Kafka delivery semantics before streaming-heavy interviews.
+    - Ask the recruiter up front which areas the panel will probe.
+  notes: |
+    Rejected after the first technical round. Applied to Payments Core via a referral instead.

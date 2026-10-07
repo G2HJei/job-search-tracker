@@ -1,0 +1,22 @@
+# Live reload for development: `go tool task dev` (or `go tool air`).
+# Always run air through `go tool`: an `air` on PATH may be something else.
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  pre_cmd = ["go tool templ generate"]
+  cmd = "go build -o ./tmp/tracker.exe ./cmd/tracker"
+  entrypoint = ["./tmp/tracker.exe", "--data", "./data", "--dev", "--open=false"] # air restarts on every change
+  include_ext = ["go", "templ", "css", "js"]
+  exclude_dir = ["tmp", "dist", "data", "testdata", ".idea", ".playwright-mcp"]
+  exclude_regex = ['_templ\.go$', '_test\.go$'] # prevents a generate → rebuild loop
+  delay = 200
+  stop_on_error = true
+
+[proxy] # browser auto-reload: open http://127.0.0.1:8766 during development
+  enabled = true
+  proxy_port = 8766
+  app_port = 8765
+
+[misc]
+  clean_on_exit = true

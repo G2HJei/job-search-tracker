@@ -1,0 +1,63 @@
+package views
+
+import "strconv"
+
+templ SettingsPage(p Page, d SettingsData) {
+	@Layout(p) {
+		<div class="page-head">
+			<h1>Settings</h1>
+		</div>
+		<article>
+			<dl class="fields">
+				<dt>Data directory</dt>
+				<dd><code>{ d.Dir }</code></dd>
+				<dt>Contents</dt>
+				<dd>{ strconv.Itoa(d.Applications) } applications, { strconv.Itoa(d.Companies) } companies</dd>
+				<dt>Version</dt>
+				<dd>{ d.Version }</dd>
+			</dl>
+			<div class="button-row">
+				<form method="post" action="/settings/reload" class="inline-form">
+					<input type="hidden" name="return" value="/settings"/>
+					<button type="submit">Reload from disk</button>
+				</form>
+				<a href="/export.csv" role="button" class="secondary outline">Export CSV</a>
+				<a href="/backup.zip" role="button" class="secondary outline">Download backup (.zip)</a>
+			</div>
+			<p class="muted small">
+				Tip: run <code>git init</code> inside the data directory (separately from the app) to keep a history of your data.
+			</p>
+		</article>
+		<article>
+			<header><h2>Load problems</h2></header>
+			if len(d.LoadErrors) == 0 && len(d.Warnings) == 0 {
+				<p class="muted">All files loaded.</p>
+			} else {
+				for _, w := range d.Warnings {
+					<p class="unknown-value">{ w }</p>
+				}
+				if len(d.LoadErrors) > 0 {
+					<p>These files were skipped. The app never overwrites them; fix them in an editor and click Reload.</p>
+					<table class="load-errors">
+						<thead><tr><th>File</th><th>Problem</th></tr></thead>
+						<tbody>
+							for _, e := range d.LoadErrors {
+								<tr>
+									<td><code>{ e.Path }</code></td>
+									<td><pre>{ e.Err }</pre></td>
+								</tr>
+							}
+						</tbody>
+					</table>
+				}
+			}
+		</article>
+		<article>
+			<header>
+				<h2>config.yaml</h2>
+				<p class="muted small">Dropdown lists and settings. Edit the file directly, then reload.</p>
+			</header>
+			<pre class="config"><code>{ d.ConfigYAML }</code></pre>
+		</article>
+	}
+}

@@ -1,0 +1,28 @@
+schemaVersion: 1
+id: 2026-10-03-copperkettle-games-backend-engineer-live-services
+createdAt: 2026-10-03T22:10:00+01:00
+updatedAt: 2026-10-03T22:10:00+01:00
+priority: low
+status: wishlist
+companyId: copperkettle-games
+job:
+  title: Backend Engineer, Live Services
+  postingUrl: https://copperkettle-games.example/jobs/backend-live-services
+  location: Dundee or remote (UK)
+  keyRequirements: |
+    - Matchmaking, leaderboards and player inventory services
+    - Go or C#, Redis, high-concurrency WebSockets
+  fit: 3
+  interest: 4
+  advertisedSalary: { min: 60000, max: 72000, currency: GBP, period: year, note: DOE }
+contacts:
+  referrer:
+    name: Sam Whitlock
+    role: Gameplay Programmer
+    email: sam.whitlock@example.org
+    notes: Old university friend. Ask whether he can refer me before applying.
+process:
+  nextStep: Ask Sam about the team and a referral
+other:
+  notes: |
+    Pays less than fintech, but the work sounds fun. Revisit after the Bramblewood and Larkspur decisions.

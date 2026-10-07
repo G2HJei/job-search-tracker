@@ -1,0 +1,132 @@
+package sections
+
+import "strings"
+
+// View renders a section's view card.
+templ View(name string, d Data) {
+	switch name {
+		case "company":
+			@companyView(d)
+		case "job":
+			@jobView(d)
+		case "contacts":
+			@contactsView(d)
+		case "process":
+			@processView(d)
+		case "compensation":
+			@compensationView(d)
+		case "other":
+			@otherView(d)
+	}
+}
+
+// Edit renders a section's edit card.
+templ Edit(name string, d Data) {
+	switch name {
+		case "company":
+			@companyEdit(d)
+		case "job":
+			@jobEdit(d)
+		case "contacts":
+			@contactsEdit(d)
+		case "process":
+			@processEdit(d)
+		case "compensation":
+			@compensationEdit(d)
+		case "other":
+			@otherEdit(d)
+	}
+}
+
+// OOB renders a view card for an out-of-band swap, to refresh a section
+// as a side effect of another request.
+templ OOB(name string, d Data) {
+	@View(name, d.withOOB())
+}
+
+templ viewCard(d Data, name string) {
+	<article id={ sectionID(name) } class="section" { d.oobAttrs()... }>
+		<header class="section-head">
+			<h2>{ Title(name) }</h2>
+			<a
+				href={ d.sectionURL(name) + "/edit" }
+				hx-get={ d.sectionURL(name) + "/edit" }
+				hx-target={ target(name) }
+				hx-swap="outerHTML"
+				role="button"
+				class="outline secondary small"
+			>Edit</a>
+		</header>
+		{ children... }
+	</article>
+}
+
+templ editCard(d Data, name string, after templ.Component) {
+	<article id={ sectionID(name) } class="section editing">
+		<header class="section-head">
+			<h2>{ Title(name) }</h2>
+		</header>
+		<form method="post" action={ d.sectionURL(name) } hx-post={ d.sectionURL(name) } hx-target={ target(name) } hx-swap="outerHTML">
+			<input type="hidden" name="rev" value={ d.rev(name) }/>
+			if d.Error != "" {
+				<p class="form-error" role="alert">{ d.Error }</p>
+			} else if len(d.Errors) > 0 {
+				<p class="form-error" role="alert">Please fix the highlighted fields.</p>
+			}
+			{ children... }
+			<div class="form-actions">
+				<button type="submit">Save</button>
+				<a
+					href={ d.appURL() + "#" + sectionID(name) }
+					hx-get={ d.sectionURL(name) }
+					hx-target={ target(name) }
+					hx-swap="outerHTML"
+					role="button"
+					class="secondary outline"
+				>Cancel</a>
+			</div>
+		</form>
+		if after != nil {
+			@after
+		}
+	</article>
+}
+
+templ fieldList(f fields) {
+	if len(f.rows) > 0 {
+		<dl class="fields">
+			for _, r := range f.rows {
+				<dt>{ r.Label }</dt>
+				<dd>
+					@r.Value
+				</dd>
+			}
+		</dl>
+	}
+	if len(f.empty) > 0 {
+		<p class="empty-fields">Not set: { strings.Join(f.empty, ", ") }</p>
+	}
+}
+
+// addRowButton fetches a blank repeatable row and appends it to #rows-<id>.
+templ addRowButton(url, id, label string) {
+	<button
+		type="button"
+		class="secondary outline small add-row"
+		hx-get={ url }
+		hx-target={ "#rows-" + id }
+		hx-swap="beforeend"
+	>+ { label }</button>
+}
+
+templ removeRowButton() {
+	<button type="button" class="secondary outline small remove-row" data-remove-row aria-label="Remove">Remove</button>
+}
+
+templ datalist(id string, values []string) {
+	<datalist id={ id }>
+		for _, v := range values {
+			<option value={ v }></option>
+		}
+	</datalist>
+}

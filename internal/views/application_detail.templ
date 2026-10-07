@@ -1,0 +1,171 @@
+package views
+
+import (
+	"github.com/G2HJei/job-search-tracker/internal/views/components"
+	"github.com/G2HJei/job-search-tracker/internal/views/sections"
+)
+
+templ DetailPage(p Page, d DetailData) {
+	@Layout(p) {
+		@DetailHeader(d, false)
+		if len(d.Warnings) > 0 {
+			<div class="banner subtle">
+				for _, w := range sortedValues(d.Warnings) {
+					<p>{ w }. It is kept as-is; add it to config.yaml or pick another value.</p>
+				}
+			</div>
+		}
+		<div class="sections">
+			for _, name := range sections.Names {
+				if name == d.EditName {
+					@sections.Edit(name, d.EditData)
+				} else {
+					@sections.View(name, d.Base)
+				}
+			}
+		</div>
+		@attachments(d)
+		<section class="danger-zone">
+			<form method="post" action={ appURL(d) + "/delete" } data-confirm="Move this application to the trash? Its folder is moved to data/.trash and can be restored by hand.">
+				<button type="submit" class="secondary outline small">Delete application</button>
+			</form>
+		</section>
+	}
+}
+
+// DetailHeader shows the title, inline priority/status selects and key
+// dates. Status and priority changes re-render it.
+templ DetailHeader(d DetailData, oob bool) {
+	{{ a := d.Base.App }}
+	{{ cfg := d.Base.Config }}
+	<header id="app-header" class="app-header" { oobAttr(oob)... }>
+		<div class="title-row">
+			<hgroup>
+				<h1>{ a.Job.Title }</h1>
+				<p>
+					if d.Base.CompanyFound {
+						<a href={ "/companies/" + a.CompanyID }>{ d.Base.Company.Name }</a>
+					} else {
+						<span class="unknown-value">{ a.CompanyID }</span>
+					}
+					if a.Job.Location != "" {
+						<span class="muted">· { a.Job.Location }</span>
+					}
+					if a.Job.PostingURL != "" {
+						· @components.ExtLink(a.Job.PostingURL, "Job posting ↗")
+					}
+				</p>
+			</hgroup>
+			<div class="quick-controls">
+				<form method="post" action={ appURL(d) + "/priority" } class="inline-form">
+					<input type="hidden" name="ctx" value="detail"/>
+					<label>
+						<span class="small muted">Priority</span>
+						@components.SelectOnly("priority", a.Priority, components.Priorities(&cfg), "", templ.Attributes{
+							"hx-post": appURL(d) + "/priority", "hx-trigger": "change", "hx-target": "#app-header", "hx-swap": "outerHTML",
+							"class": "pill-select color-" + priorityColor(cfg, a.Priority),
+						})
+					</label>
+					<noscript><button type="submit" class="small">Set</button></noscript>
+				</form>
+				<form method="post" action={ appURL(d) + "/status" } class="inline-form">
+					<input type="hidden" name="ctx" value="detail"/>
+					<label>
+						<span class="small muted">Status</span>
+						@components.SelectOnly("status", a.Status, components.Statuses(&cfg), "", templ.Attributes{
+							"hx-post": appURL(d) + "/status", "hx-trigger": "change", "hx-target": "#app-header", "hx-swap": "outerHTML",
+							"class": "pill-select status-" + a.Status,
+						})
+					</label>
+					<noscript><button type="submit" class="small">Set</button></noscript>
+				</form>
+				<form method="post" action={ appURL(d) + "/touch" } hx-post={ appURL(d) + "/touch" } hx-target="#app-header" hx-swap="outerHTML" class="inline-form">
+					<input type="hidden" name="ctx" value="detail"/>
+					<button type="submit" class="outline small" title="Set last contact date to today">Contacted today</button>
+				</form>
+			</div>
+		</div>
+		{{ dates := keyDates(d) }}
+		if len(dates) > 0 {
+			<ul class="key-dates">
+				for _, k := range dates {
+					<li class={ templ.KV("overdue", k.Overdue) }>
+						<span class="small muted">{ k.Label }</span>
+						<strong>{ k.Value }</strong>
+						if k.Note != "" {
+							<span class="small muted">{ k.Note }</span>
+						}
+					</li>
+				}
+			</ul>
+		}
+	</header>
+}
+
+templ attachments(d DetailData) {
+	{{ a := d.Base.App }}
+	<article id="attachments" class="section">
+		<header class="section-head"><h2>Attachments</h2></header>
+		if len(d.Base.Files) == 0 {
+			<p class="muted">No files yet. Upload the job posting, your cover letter or a take-home submission.</p>
+		} else {
+			<ul class="files">
+				for _, f := range d.Base.Files {
+					<li>
+						<a href={ d.Base.FileURL(f.Name) } target="_blank">{ f.Name }</a>
+						<span class="muted small">{ components.FileSize(f.Size) }</span>
+						if f.Name == a.Job.PostingCopy {
+							<span class="pill">posting copy</span>
+						}
+						if contains(a.Job.ExtraMaterials, f.Name) {
+							<span class="pill">sent</span>
+						}
+						<form method="post" action={ d.Base.FileURL(f.Name) + "/delete" } class="inline-form" data-confirm={ "Move " + f.Name + " to the trash?" }>
+							<button type="submit" class="secondary outline small">Delete</button>
+						</form>
+					</li>
+				}
+			</ul>
+		}
+		if a.Job.CVVersion != "" {
+			<p>
+				CV sent:
+				if contains(d.Base.CVs, a.Job.CVVersion) {
+					<a href={ "/cv/" + a.Job.CVVersion } target="_blank">{ a.Job.CVVersion }</a>
+				} else {
+					<span class="unknown-value" title="Not in the CV library">{ a.Job.CVVersion }</span>
+				}
+			</p>
+		}
+		if d.PostingText != "" {
+			<details class="posting-text">
+				<summary>Saved posting ({ a.Job.PostingCopy })</summary>
+				@components.Markdown(d.PostingText)
+			</details>
+		}
+		<div class="grid upload-forms">
+			<form method="post" action={ appURL(d) + "/files" } enctype="multipart/form-data">
+				<label>
+					Upload a file <span class="muted small">(max 25 MB)</span>
+					<input type="file" name="file" required/>
+				</label>
+				<label>
+					Use as
+					<select name="purpose">
+						<option value="">Attachment</option>
+						<option value="posting">Saved posting copy (PDF/HTML/MHTML)</option>
+						<option value="material">Extra material sent (e.g. cover letter)</option>
+					</select>
+				</label>
+				<button type="submit" class="secondary">Upload</button>
+			</form>
+			<form method="post" action={ appURL(d) + "/posting-text" }>
+				<label>
+					Or paste the job posting text <span class="muted small">(saved as posting.md)</span>
+					<textarea name="text" rows="6" placeholder="Paste the job ad here…" required></textarea>
+				</label>
+				<button type="submit" class="secondary">Save posting text</button>
+			</form>
+		</div>
+	</article>
+}

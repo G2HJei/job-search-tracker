@@ -1,0 +1,41 @@
+schemaVersion: 1
+id: 2026-09-08-harbourline-logistics-senior-software-engineer-routing
+createdAt: 2026-09-08T13:35:00+01:00
+updatedAt: 2026-09-11T16:20:00+01:00
+priority: medium
+status: applied
+companyId: harbourline-logistics
+job:
+  title: Senior Software Engineer, Routing
+  postingUrl: https://careers.harbourline.example/vacancies/HL-2026-1240
+  postingCopy: posting.html
+  jobId: HL-2026-1240
+  department: Network Optimisation
+  location: Southampton or London (hybrid, 2 days)
+  keyRequirements: |
+    - Strong Java or Go; graph algorithms and routing heuristics
+    - Geospatial data (PostGIS, H3)
+    - Profiling latency-sensitive services
+  fit: 4
+  interest: 3
+  channel: Company website
+  cvVersion: cv-backend-v3.pdf
+  advertisedSalary: { min: 72000, max: 88000, currency: GBP, period: year, note: plus car allowance }
+contacts:
+  recruiters:
+    - name: Daniel Firth
+      role: Recruitment Partner
+      email: daniel.firth@harbourline.example
+      phone: +44 7700 900548
+process:
+  nextStep: Chase Daniel for an update
+  lastContactDate: 2026-09-11
+  dateApplied: 2026-09-09
+  followUpDate: 2026-09-23
+compensation:
+  asked: { min: 85000, currency: GBP, period: year }
+  contractType: Permanent
+  noticePeriod: 1 month
+other:
+  notes: |
+    Daniel acknowledged on 11 Sep and said the hiring manager is on leave until late September.

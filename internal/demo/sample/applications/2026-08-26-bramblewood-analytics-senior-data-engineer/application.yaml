@@ -1,0 +1,57 @@
+schemaVersion: 1
+id: 2026-08-26-bramblewood-analytics-senior-data-engineer
+createdAt: 2026-08-26T08:50:00+01:00
+updatedAt: 2026-09-29T12:10:00+01:00
+priority: medium
+status: withdrawn
+companyId: bramblewood-analytics
+job:
+  title: Senior Data Engineer
+  postingUrl: https://bramblewood-analytics.example/jobs/senior-data-engineer
+  jobId: BW-DE-22
+  department: Data Platform
+  location: Manchester (hybrid) or remote UK
+  keyRequirements: |
+    - Kafka and ClickHouse (or a similar OLAP store)
+    - Python or Go for pipeline services
+    - dbt experience is a plus
+  fit: 3
+  interest: 3
+  channel: LinkedIn
+  cvVersion: cv-backend-v3.pdf
+  advertisedSalary: { min: 70000, max: 85000, currency: GBP, period: year }
+contacts:
+  recruiters:
+    - name: Bethany Kerr
+      role: Talent Acquisition Lead
+      email: bethany.kerr@bramblewood-analytics.example
+      linkedin: https://www.linkedin.com/in/fake-bethany-kerr
+  hiringManager:
+    name: Nikhil Desai
+    role: Head of Data Platform
+    email: nikhil.desai@bramblewood-analytics.example
+  interviewers:
+    - { name: Nikhil Desai, role: Head of Data Platform }
+    - { name: Joanna Pietrzak, role: Staff Data Engineer }
+process:
+  lastContactDate: 2026-09-29
+  dateApplied: 2026-08-26
+  screeningDate: 2026-09-03T12:30
+  interviews:
+    - date: 2026-09-10T15:30
+      type: Technical
+      interviewers: [Nikhil Desai]
+      notes: |
+        Pipeline design discussion. Nikhil suggested the new Engineering Lead role would suit me better.
+    - date: 2026-10-12T10:00
+      type: Panel
+      interviewers: [Joanna Pietrzak]
+      notes: Cancelled when I withdrew on 29 Sep.
+  decision: Withdrew
+compensation:
+  asked: { min: 82000, currency: GBP, period: year }
+  contractType: Permanent
+other:
+  notes: |
+    Withdrew on 29 Sep to focus on the Engineering Lead, Data Platform process at the same company
+    (agreed with Bethany and Nikhil).

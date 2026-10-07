@@ -1,0 +1,67 @@
+schemaVersion: 1
+id: 2026-09-29-quillfeather-labs-platform-engineer
+createdAt: 2026-09-29T17:45:00+01:00
+updatedAt: 2026-10-01T11:20:00+01:00
+priority: medium
+status: screening
+companyId: quillfeather-labs
+job:
+  title: Platform Engineer
+  postingUrl: https://quillfeather.example/careers/platform-engineer
+  postingCopy: posting.md
+  department: Developer Platform
+  location: Remote (UK)
+  keyRequirements: |
+    - Kubernetes operators and Terraform
+    - Go for internal tooling
+    - CI/CD at scale (build caching, ephemeral environments)
+  fit: 4
+  interest: 4
+  channel: Recruitment agency
+  cvVersion: cv-backend-v3.pdf
+  advertisedSalary: { min: 80000, max: 92000, currency: GBP, period: year, note: plus share options }
+contacts:
+  recruiters:
+    - name: Harriet Coles
+      role: Senior Consultant, Kestrelmoor Talent (agency)
+      email: harriet.coles@kestrelmoor-talent.example
+      phone: +44 7700 900155
+      linkedin: https://www.linkedin.com/in/fake-harriet-coles
+      notes: Reached out first on LinkedIn; handles scheduling and feedback.
+    - name: Marcus Lindgren
+      role: Talent Partner
+      email: marcus@quillfeather.example
+  hiringManager:
+    name: Elena Vasquez
+    role: Platform Lead
+    email: elena@quillfeather.example
+  interviewers:
+    - { name: Elena Vasquez, role: Platform Lead }
+    - { name: Kofi Mensah, role: Senior Platform Engineer, email: kofi@quillfeather.example }
+process:
+  nextStep: Phone screen with Marcus
+  nextStepDate: 2026-10-08
+  lastContactDate: 2026-10-01
+  dateApplied: 2026-09-30
+  screeningDate: 2026-10-08T11:30
+  interviews:
+    - date: 2026-10-15T10:00
+      type: Technical
+      interviewers: [Elena Vasquez, Kofi Mensah]
+      notes: Provisionally booked by Harriet; goes ahead only if the screen goes well.
+  followUpDate: 2026-10-06
+  qa:
+    - round: 0
+      question: What should I ask in the screen?
+      answer: |
+        - How big is the platform team, and who are its internal customers?
+        - Is the role fully remote long term?
+        - What does on-call look like?
+compensation:
+  asked: { min: 88000, currency: GBP, period: year }
+  contractType: Permanent
+  noticePeriod: 1 month
+other:
+  notes: |
+    Follow-up due: send Harriet my right-to-work documents and preferred interview slots
+    (she asked on 1 Oct).

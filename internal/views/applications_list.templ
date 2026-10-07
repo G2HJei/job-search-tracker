@@ -1,0 +1,184 @@
+package views
+
+import (
+	"strconv"
+
+	"github.com/G2HJei/job-search-tracker/internal/model"
+	"github.com/G2HJei/job-search-tracker/internal/views/components"
+)
+
+templ ApplicationsPage(p Page, l ListData) {
+	@Layout(p) {
+		<div class="page-head">
+			<h1>Applications</h1>
+			<a href="/applications/new" role="button">+ New application</a>
+		</div>
+		<form
+			id="filters"
+			class="filters"
+			action="/applications"
+			method="get"
+			hx-get="/applications"
+			hx-target="#results"
+			hx-push-url="true"
+			hx-trigger="input delay:300ms, submit"
+		>
+			<input type="search" name="q" value={ l.Q } placeholder="Search company, title, notes, contacts…" aria-label="Search"/>
+			@components.SelectOnly("status", l.Status, components.Statuses(&l.Config), "All statuses", templ.Attributes{"aria-label": "Status"})
+			@components.SelectOnly("priority", l.Priority, components.Priorities(&l.Config), "All priorities", templ.Attributes{"aria-label": "Priority"})
+			<label class="toggle">
+				<input type="checkbox" role="switch" name="closed" value="1" checked?={ l.Closed }/>
+				Show closed
+			</label>
+			<noscript><button type="submit" class="secondary">Filter</button></noscript>
+		</form>
+		<div id="results">
+			@ApplicationsResults(l)
+		</div>
+	}
+}
+
+// ApplicationsResults is the table part, swapped in by search and sorting.
+templ ApplicationsResults(l ListData) {
+	<input type="hidden" name="sort" value={ l.Sort } form="filters"/>
+	<input type="hidden" name="dir" value={ l.Dir } form="filters"/>
+	if len(l.Rows) == 0 {
+		<article class="empty-state">
+			if l.Total == 0 {
+				<p>No applications yet.</p>
+				<a href="/applications/new" role="button">+ New application</a>
+			} else {
+				<p>No applications match these filters.</p>
+				<a href="/applications">Clear filters</a>
+			}
+		</article>
+	} else {
+		<p class="muted small">{ strconv.Itoa(len(l.Rows)) } of { strconv.Itoa(l.Total) } applications</p>
+		<div class="table-wrap">
+			<table class="striped applications">
+				<thead>
+					<tr>
+						@sortHeader(l, "priority", "Priority")
+						@sortHeader(l, "status", "Status")
+						@sortHeader(l, "company", "Company")
+						@sortHeader(l, "title", "Job title")
+						@sortHeader(l, "location", "Location")
+						@sortHeader(l, "fit", "Fit")
+						@sortHeader(l, "interest", "Interest")
+						@sortHeader(l, "nextStep", "Next step")
+						@sortHeader(l, "nextStepDate", "Next step date")
+						@sortHeader(l, "lastContact", "Last contact")
+						@sortHeader(l, "applied", "Applied")
+					</tr>
+				</thead>
+				<tbody>
+					for _, r := range l.Rows {
+						@applicationRow(l.Config, r, l.Today)
+					}
+				</tbody>
+			</table>
+		</div>
+	}
+}
+
+templ sortHeader(l ListData, col, label string) {
+	<th scope="col">
+		<a href={ l.SortURL(col) } hx-get={ l.SortURL(col) } hx-target="#results" hx-push-url="true">{ label }{ l.SortMark(col) }</a>
+	</th>
+}
+
+templ applicationRow(cfg model.Config, r Row, today model.Date) {
+	{{ a := r.App }}
+	<tr>
+		<td>
+			@components.PriorityPill(&cfg, a.Priority)
+		</td>
+		<td>
+			@components.StatusPill(&cfg, a.Status)
+		</td>
+		<td>
+			@companyName(r)
+		</td>
+		<td><a href={ "/applications/" + a.ID }>{ a.Job.Title }</a></td>
+		<td>{ a.Job.Location }</td>
+		<td class="nowrap">
+			@components.Rating(a.Job.Fit)
+		</td>
+		<td class="nowrap">
+			@components.Rating(a.Job.Interest)
+		</td>
+		<td>{ a.Process.NextStep }</td>
+		<td class={ "nowrap", templ.KV("overdue", isOverdue(cfg, a, today)) }>{ components.ShortDate(a.Process.NextStepDate, today) }</td>
+		<td class="nowrap">{ components.ShortDate(a.Process.LastContactDate, today) }</td>
+		<td class="nowrap">{ components.ShortDate(a.Process.DateApplied, today) }</td>
+	</tr>
+}
+
+templ companyName(r Row) {
+	if r.CompanyKnown {
+		<a href={ "/companies/" + r.App.CompanyID }>{ r.Company }</a>
+	} else {
+		<span class="unknown-value" title="Company record not found">{ r.App.CompanyID }</span>
+	}
+}
+
+// RowsTable is a compact table of applications, used on company pages.
+templ RowsTable(cfg model.Config, rows []Row, today model.Date) {
+	<div class="table-wrap">
+		<table class="striped">
+			<thead>
+				<tr>
+					<th>Priority</th>
+					<th>Status</th>
+					<th>Job title</th>
+					<th>Next step</th>
+					<th>Next step date</th>
+					<th>Applied</th>
+				</tr>
+			</thead>
+			<tbody>
+				for _, r := range rows {
+					<tr>
+						<td>
+							@components.PriorityPill(&cfg, r.App.Priority)
+						</td>
+						<td>
+							@components.StatusPill(&cfg, r.App.Status)
+						</td>
+						<td><a href={ "/applications/" + r.App.ID }>{ r.App.Job.Title }</a></td>
+						<td>{ r.App.Process.NextStep }</td>
+						<td class={ "nowrap", templ.KV("overdue", isOverdue(cfg, r.App, today)) }>{ components.ShortDate(r.App.Process.NextStepDate, today) }</td>
+						<td class="nowrap">{ components.ShortDate(r.App.Process.DateApplied, today) }</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ NewApplicationPage(p Page, d NewAppData) {
+	@Layout(p) {
+		<article class="narrow">
+			<header><h1>New application</h1></header>
+			<form method="post" action="/applications">
+				if len(d.Errors) > 0 {
+					<p class="form-error" role="alert">Please fix the highlighted fields.</p>
+				}
+				@components.Input("Company", "text", "company", d.Company, d.Errors.Get("company"), templ.Attributes{"list": "companies-list", "required": true, "autofocus": true, "autocomplete": "off", "placeholder": "Existing or new company"})
+				<datalist id="companies-list">
+					for _, c := range d.Companies {
+						<option value={ c.Name }></option>
+					}
+				</datalist>
+				@components.Input("Job title", "text", "title", d.Title, d.Errors.Get("title"), templ.Attributes{"required": true})
+				@components.Input("Job posting link", "url", "postingUrl", d.PostingURL, d.Errors.Get("postingUrl"), templ.Attributes{"placeholder": "https://"})
+				<div class="grid">
+					@components.Select("Priority", "priority", d.Priority, components.Priorities(&d.Config), d.Errors.Get("priority"), "")
+					@components.Select("Status", "status", d.Status, components.Statuses(&d.Config), d.Errors.Get("status"), "")
+				</div>
+				<button type="submit">Create and open</button>
+			</form>
+			<footer class="muted small">Fill in everything else on the application page.</footer>
+		</article>
+	}
+}

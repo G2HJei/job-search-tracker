@@ -1,0 +1,65 @@
+schemaVersion: 1
+id: 2026-10-07-acme-senior-backend-engineer
+createdAt: 2026-10-07T15:20:00+01:00
+updatedAt: 2026-10-07T15:20:00+01:00
+priority: high
+status: interviewing
+companyId: acme
+job:
+  title: Senior Backend Engineer
+  postingUrl: https://acme.example/careers/123
+  postingCopy: posting.pdf
+  jobId: R-12345
+  department: Payments Platform
+  location: London (hybrid, 2 days)
+  keyRequirements: |
+    - 5+ years Go or Java
+    - Kubernetes, Postgres
+  fit: 4
+  interest: 5
+  channel: Referral
+  cvVersion: cv-backend-v3.pdf
+  extraMaterials:
+    - cover-letter.pdf
+    - https://github.com/me/portfolio
+  advertisedSalary: {min: 80000, max: 95000, currency: GBP, period: year}
+contacts:
+  referrer:
+    name: Jane Smith
+    role: Staff Engineer
+    email: jane@example.com
+  recruiters:
+    - name: Tom Lee
+      role: Talent Partner
+      email: tom@acme.example
+      linkedin: https://linkedin.com/in/tomlee
+  hiringManager:
+    name: Priya Patel
+    role: Engineering Manager
+  interviewers:
+    - name: Alex Kim
+      role: Senior Engineer
+process:
+  nextStep: Technical interview (live coding)
+  nextStepDate: 2026-10-14
+  lastContactDate: 2026-10-09
+  dateApplied: 2026-10-07
+  screeningDate: 2026-10-09T10:00
+  interviews:
+    - date: 2026-10-14T14:00
+      type: Technical
+      interviewers: [Alex Kim]
+  followUpDate: 2026-10-16
+  qa:
+    - round: 0
+      question: Why are you leaving your current role?
+      answer: |
+        Looking for larger-scale distributed systems work…
+  decision: Pending
+compensation:
+  asked: {min: 92000, currency: GBP, period: year}
+  contractType: Permanent
+  noticePeriod: 1 month
+other:
+  notes: |
+    Strong engineering blog; ask about on-call.

@@ -1,0 +1,331 @@
+package sections
+
+import (
+	"github.com/G2HJei/job-search-tracker/internal/model"
+	"github.com/G2HJei/job-search-tracker/internal/views/components"
+)
+
+// ---- Company ----
+templ companyView(d Data) {
+	@viewCard(d, "company") {
+		if d.CompanyFound {
+			<p class="company-name">
+				<a href={ "/companies/" + d.Company.ID }><strong>{ d.Company.Name }</strong></a>
+				if d.CompanyApps > 1 {
+					<span class="muted">· { itoa(d.CompanyApps) } applications</span>
+				}
+			</p>
+			@fieldList(companyFields(d))
+		} else {
+			<p class="unknown-value">
+				No company record "{ d.App.CompanyID }" (companies/{ d.App.CompanyID }.yaml is missing or could not be loaded).
+			</p>
+		}
+	}
+}
+
+templ companyEdit(d Data) {
+	@editCard(d, "company", relinkForm(d)) {
+		if !d.CompanyFound {
+			<p class="notice">No company record found for "{ d.App.CompanyID }". Saving creates one.</p>
+		} else if d.CompanyApps > 1 {
+			<p class="notice">Shared by { itoa(d.CompanyApps) } applications. Changes apply to all of them.</p>
+		}
+		@CompanyFields(d.Company, d.Config, d.Industries, d.Errors)
+	}
+}
+
+// CompanyFields is shared by the company section and the company pages.
+templ CompanyFields(c model.Company, cfg model.Config, industries []string, errs model.FieldErrors) {
+	<div class="grid">
+		@components.Input("Company", "text", "name", c.Name, errs.Get("company.name"), templ.Attributes{"required": true})
+		@components.Input("Industry", "text", "industry", c.Industry, "", templ.Attributes{"list": "industries-list"})
+	</div>
+	@datalist("industries-list", industries)
+	<div class="grid">
+		@components.Select("Company size", "size", c.Size, components.Strings(cfg.CompanySizes), "", "–")
+		@components.Input("HQ location", "text", "hq", c.HQ, "", nil)
+	</div>
+	@components.Input("Website", "url", "website", c.Website, errs.Get("company.website"), templ.Attributes{"placeholder": "https://"})
+	@components.TextArea("Notes", "notes", c.Notes, "", 3)
+}
+
+templ relinkForm(d Data) {
+	<details class="relink">
+		<summary>Link this application to a different company</summary>
+		<form method="post" action={ d.appURL() + "/company" } class="inline-form">
+			<input type="text" name="company" list="companies-list" placeholder="Company name (new or existing)" required aria-label="Company"/>
+			<button type="submit" class="secondary">Move</button>
+		</form>
+		<datalist id="companies-list">
+			for _, c := range d.Companies {
+				<option value={ c.Name }></option>
+			}
+		</datalist>
+	</details>
+}
+
+// ---- Job ----
+templ jobView(d Data) {
+	@viewCard(d, "job") {
+		@fieldList(jobFields(d))
+	}
+}
+
+templ jobEdit(d Data) {
+	@editCard(d, "job", nil) {
+		{{ j := d.App.Job }}
+		@components.Input("Job title", "text", "title", j.Title, d.err("job.title"), templ.Attributes{"required": true})
+		<div class="grid">
+			@components.Input("Job posting link", "url", "postingUrl", j.PostingURL, d.err("job.postingUrl"), templ.Attributes{"placeholder": "https://"})
+			@components.Input("Saved posting copy", "text", "postingCopy", j.PostingCopy, "", templ.Attributes{"list": "files-list", "placeholder": "Upload or paste it under Attachments"})
+		</div>
+		@datalist("files-list", d.fileNames())
+		<div class="grid">
+			@components.Input("Job ID", "text", "jobId", j.JobID, "", nil)
+			@components.Input("Department / team", "text", "department", j.Department, "", nil)
+			@components.Input("Location", "text", "location", j.Location, "", nil)
+		</div>
+		@components.TextArea("Key requirements (Markdown)", "keyRequirements", j.KeyRequirements, "", 5)
+		<div class="grid">
+			@components.RatingInput("Fit", "fit", j.Fit, d.err("job.fit"))
+			@components.RatingInput("Interest level", "interest", j.Interest, d.err("job.interest"))
+		</div>
+		<div class="grid">
+			@components.Select("Application channel", "channel", j.Channel, components.Strings(d.Config.Channels), "", "–")
+			@components.Input("CV version", "text", "cvVersion", j.CVVersion, "", templ.Attributes{"list": "cv-list", "placeholder": "Pick from the CV library or type"})
+		</div>
+		@datalist("cv-list", d.CVs)
+		<fieldset>
+			<legend>Extra materials sent</legend>
+			<div id="rows-material" class="rows">
+				for i, m := range rowsOrBlank(j.ExtraMaterials) {
+					@MaterialRow(m, d.err("job.extraMaterials."+itoa(i)))
+				}
+			</div>
+			@addRowButton("/partials/row/material", "material", "Add material")
+		</fieldset>
+		@components.SalaryInput("Advertised salary range", "advertisedSalary", j.AdvertisedSalary, &d.Config, d.err("job.advertisedSalary"))
+	}
+}
+
+// MaterialRow is one "extra material": an attachment name or a link.
+templ MaterialRow(value, err string) {
+	<div class="row-item material-row" data-row>
+		<span role="group">
+			<input type="text" name="material" value={ value } list="files-list" placeholder="File name or https:// link" aria-label="Material" { components.Invalid(err)... }/>
+			@removeRowButton()
+		</span>
+		@components.ErrorText(err)
+	</div>
+}
+
+// ---- Contacts ----
+templ contactsView(d Data) {
+	@viewCard(d, "contacts") {
+		{{ c := d.App.Contacts }}
+		{{ var empty []string }}
+		<div class="contacts">
+			if c.Referrer != nil {
+				@contactGroup("Referrer", []model.Contact{*c.Referrer})
+			} else {
+				{{ empty = append(empty, "Referrer") }}
+			}
+			if len(c.Recruiters) > 0 {
+				@contactGroup("Recruiters", c.Recruiters)
+			} else {
+				{{ empty = append(empty, "Recruiters") }}
+			}
+			if c.HiringManager != nil {
+				@contactGroup("Hiring manager", []model.Contact{*c.HiringManager})
+			} else {
+				{{ empty = append(empty, "Hiring manager") }}
+			}
+			if len(c.Interviewers) > 0 {
+				@contactGroup("Interviewers", c.Interviewers)
+			} else {
+				{{ empty = append(empty, "Interviewers") }}
+			}
+		</div>
+		@fieldList(fields{empty: empty})
+	}
+}
+
+templ contactGroup(label string, cs []model.Contact) {
+	<div class="contact-group">
+		<h3>{ label }</h3>
+		for _, c := range cs {
+			@components.ContactView(c)
+		}
+	</div>
+}
+
+templ contactsEdit(d Data) {
+	@editCard(d, "contacts", nil) {
+		{{ c := d.App.Contacts }}
+		<fieldset class="contact-block">
+			<legend>Referrer</legend>
+			@components.ContactFields("referrer", deref(c.Referrer), d.Errors, "contacts.referrer")
+		</fieldset>
+		<fieldset class="contact-block">
+			<legend>Recruiters</legend>
+			<div id="rows-recruiter" class="rows">
+				for i, r := range contactsOrBlank(c.Recruiters) {
+					@ContactRow("recruiter", r, d.Errors, "contacts.recruiters."+itoa(i))
+				}
+			</div>
+			@addRowButton("/partials/row/contact?prefix=recruiter", "recruiter", "Add recruiter")
+		</fieldset>
+		<fieldset class="contact-block">
+			<legend>Hiring manager</legend>
+			@components.ContactFields("hm", deref(c.HiringManager), d.Errors, "contacts.hiringManager")
+		</fieldset>
+		<fieldset class="contact-block">
+			<legend>Interviewers</legend>
+			<div id="rows-interviewer" class="rows">
+				for i, r := range contactsOrBlank(c.Interviewers) {
+					@ContactRow("interviewer", r, d.Errors, "contacts.interviewers."+itoa(i))
+				}
+			</div>
+			@addRowButton("/partials/row/contact?prefix=interviewer", "interviewer", "Add interviewer")
+		</fieldset>
+	}
+}
+
+// ContactRow is one repeatable contact (recruiter or interviewer).
+templ ContactRow(prefix string, c model.Contact, errs model.FieldErrors, key string) {
+	<div class="row-item contact-row" data-row>
+		@components.ContactFields(prefix, c, errs, key)
+		@removeRowButton()
+	</div>
+}
+
+// ---- Hiring process ----
+templ processView(d Data) {
+	@viewCard(d, "process") {
+		@fieldList(processFields(d))
+	}
+}
+
+templ processEdit(d Data) {
+	@editCard(d, "process", nil) {
+		{{ p := d.App.Process }}
+		<div class="grid">
+			@components.Input("Next step", "text", "nextStep", p.NextStep, "", nil)
+			@components.DateInput("Next step date", "nextStepDate", p.NextStepDate, d.err("process.nextStepDate"), false)
+		</div>
+		<div class="grid">
+			@components.DateInput("Last contact date", "lastContactDate", p.LastContactDate, d.err("process.lastContactDate"), true)
+			@components.DateInput("Date applied", "dateApplied", p.DateApplied, d.err("process.dateApplied"), false)
+			@components.DateTimeInput("Screening date", "screeningDate", p.ScreeningDate, d.err("process.screeningDate"))
+		</div>
+		<fieldset>
+			<legend>Interview rounds</legend>
+			<div id="rows-interview" class="rows interview-rows">
+				for i, iv := range interviewsOrBlank(p.Interviews) {
+					@InterviewRow(iv, d.Config.InterviewTypes, d.err("process.interviews."+itoa(i)+".date"))
+				}
+			</div>
+			@addRowButton("/partials/row/interview", "interview", "Add round")
+			@datalist("interviewer-names", d.interviewerNames())
+		</fieldset>
+		<div class="grid">
+			@components.DateInput("Follow-up date", "followUpDate", p.FollowUpDate, d.err("process.followUpDate"), false)
+			@components.DateInput("Offer date", "offerDate", p.OfferDate, d.err("process.offerDate"), false)
+			@components.DateInput("Offer response deadline", "offerResponseDeadline", p.OfferResponseDeadline, d.err("process.offerResponseDeadline"), false)
+		</div>
+		<fieldset>
+			<legend>Questions asked / answers</legend>
+			<div id="rows-qa" class="rows">
+				for i, q := range qaOrBlank(p.QA) {
+					@QARow(q, d.roundOptions(q.Round), d.err("process.qa."+itoa(i)+".question"))
+				}
+			</div>
+			@addRowButton("/partials/row/qa?rounds="+itoa(max(len(p.Interviews), 3)), "qa", "Add question")
+		</fieldset>
+		<fieldset>
+			<legend>Take-home task</legend>
+			@components.TextArea("Details (Markdown)", "takeHomeDetails", p.TakeHome.Details, "", 3)
+			@components.DateTimeInput("Deadline", "takeHomeDeadline", p.TakeHome.Deadline, d.err("process.takeHome.deadline"))
+		</fieldset>
+		@components.Select("Decision", "decision", p.Decision, components.Strings(d.Config.Decisions), "", "–")
+		@components.TextArea("Rejection reason / feedback (Markdown)", "rejectionFeedback", p.RejectionFeedback, "", 3)
+	}
+}
+
+// InterviewRow is one interview round. Rows are numbered with a CSS
+// counter so the labels stay right when rows are added or removed.
+templ InterviewRow(iv model.Interview, types []string, dateErr string) {
+	<div class="row-item interview-row" data-row>
+		<div class="row-head">
+			<strong class="round-label"></strong>
+			@removeRowButton()
+		</div>
+		<div class="grid">
+			@components.DateTimeInput("Date", "interview_date", iv.Date, dateErr)
+			@components.Select("Type", "interview_type", iv.Type, components.Strings(types), "", "–")
+			@components.Input("Interviewers", "text", "interview_interviewers", joinNames(iv.Interviewers), "", templ.Attributes{"list": "interviewer-names", "placeholder": "Comma-separated names"})
+		</div>
+		@components.TextArea("Notes", "interview_notes", iv.Notes, "", 2)
+	</div>
+}
+
+// QARow is one question with its answer, optionally linked to a round.
+templ QARow(q model.QA, rounds []RoundOption, questionErr string) {
+	<div class="row-item qa-row" data-row>
+		<div class="grid qa-head">
+			<label>
+				Round
+				<select name="qa_round">
+					for _, r := range rounds {
+						<option value={ itoa(r.N) } selected?={ r.N == q.Round }>{ r.Label }</option>
+					}
+				</select>
+			</label>
+			@components.Input("Question", "text", "qa_question", q.Question, questionErr, nil)
+		</div>
+		@components.TextArea("Answer (Markdown)", "qa_answer", q.Answer, "", 3)
+		@removeRowButton()
+	</div>
+}
+
+// ---- Compensation ----
+templ compensationView(d Data) {
+	@viewCard(d, "compensation") {
+		@fieldList(compensationFields(d))
+	}
+}
+
+templ compensationEdit(d Data) {
+	@editCard(d, "compensation", nil) {
+		{{ c := d.App.Compensation }}
+		<div class="grid">
+			@components.SalaryInput("Asked salary", "asked", c.Asked, &d.Config, d.err("compensation.asked"))
+			@components.SalaryInput("Offered salary", "offered", c.Offered, &d.Config, d.err("compensation.offered"))
+		</div>
+		<div class="grid">
+			@components.Select("Contract type", "contractType", c.ContractType, components.Strings(d.Config.ContractTypes), "", "–")
+			@components.Input("Bonus / commission", "text", "bonus", c.Bonus, "", nil)
+			@components.Input("Equity", "text", "equity", c.Equity, "", nil)
+		</div>
+		@components.TextArea("Benefits (Markdown)", "benefits", c.Benefits, "", 3)
+		<div class="grid">
+			@components.Input("Notice period", "text", "noticePeriod", c.NoticePeriod, "", templ.Attributes{"placeholder": "e.g. 1 month"})
+			@components.DateInput("Start date", "startDate", c.StartDate, d.err("compensation.startDate"), false)
+		</div>
+	}
+}
+
+// ---- Other ----
+templ otherView(d Data) {
+	@viewCard(d, "other") {
+		@fieldList(otherFields(d))
+	}
+}
+
+templ otherEdit(d Data) {
+	@editCard(d, "other", nil) {
+		@components.TextArea("Lessons learned (Markdown)", "lessonsLearned", d.App.Other.LessonsLearned, "", 4)
+		@components.TextArea("Notes (Markdown)", "notes", d.App.Other.Notes, "", 6)
+	}
+}

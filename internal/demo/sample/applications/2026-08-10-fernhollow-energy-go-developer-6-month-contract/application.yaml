@@ -1,0 +1,64 @@
+schemaVersion: 1
+id: 2026-08-10-fernhollow-energy-go-developer-6-month-contract
+createdAt: 2026-08-10T21:05:00+01:00
+updatedAt: 2026-10-01T17:30:00+01:00
+priority: high
+status: accepted
+companyId: fernhollow-energy
+job:
+  title: Go Developer (6-month contract)
+  postingUrl: https://fernhollow-energy.example/jobs/go-contract
+  department: Grid Platform
+  location: Remote (UK), one day a month in Edinburgh
+  keyRequirements: |
+    - Go services on Kubernetes
+    - Time-series data (meter readings, forecasting inputs)
+    - Comfortable working autonomously in a small team
+  fit: 4
+  interest: 4
+  channel: Meetup
+  cvVersion: cv-backend-v2.pdf
+  advertisedSalary: { min: 500, max: 600, currency: GBP, period: day, note: Outside IR35 }
+contacts:
+  referrer:
+    name: Callum Baird
+    role: Senior Engineer
+    email: callum.baird@fernhollow-energy.example
+    linkedin: https://www.linkedin.com/in/fake-callum-baird
+    notes: Met at the Thames Gophers meetup in July; he suggested I apply.
+  hiringManager:
+    name: Iona MacLeish
+    role: Head of Engineering
+    email: iona.macleish@fernhollow-energy.example
+    linkedin: https://www.linkedin.com/in/fake-iona-macleish
+  interviewers:
+    - { name: Callum Baird, role: Senior Engineer }
+    - { name: Iona MacLeish, role: Head of Engineering }
+process:
+  lastContactDate: 2026-10-01
+  dateApplied: 2026-08-11
+  screeningDate: 2026-08-19T16:00
+  interviews:
+    - date: 2026-08-27T13:00
+      type: Technical
+      interviewers: [Callum Baird]
+      notes: Pairing session on a meter-readings ingestion service. Relaxed and practical.
+    - date: 2026-09-10T10:00
+      type: Final
+      interviewers: [Iona MacLeish, Callum Baird]
+  offerDate: 2026-09-24
+  decision: Offer accepted
+  offerResponseDeadline: 2026-10-01
+compensation:
+  asked: { min: 575, currency: GBP, period: day }
+  offered: { min: 560, currency: GBP, period: day, note: Outside IR35; option to extend }
+  contractType: Contractor
+  benefits: |
+    - Two paid conference days
+    - Laptop provided
+  noticePeriod: 2 weeks
+  startDate: 2026-11-02
+other:
+  notes: |
+    Contract signed on 1 Oct, runs 2 Nov 2026 to 30 Apr 2027.
+    Still interviewing for permanent roles; any start date must be after the contract ends.

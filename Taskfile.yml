@@ -1,0 +1,64 @@
+# Run tasks with `go tool task <name>` (task is a tool dependency in go.mod).
+version: '3'
+
+vars:
+  VERSION:
+    sh: git describe --tags --always --dirty 2>/dev/null || echo dev
+  LDFLAGS: -s -w -X main.version={{.VERSION}}
+
+tasks:
+  generate:
+    desc: Compile .templ files to Go
+    cmds:
+      - go tool templ generate
+
+  dev:
+    desc: Live reload (open http://127.0.0.1:8766 for browser auto-refresh)
+    cmds:
+      - go tool air
+
+  run:
+    desc: Run against ./data and open the browser
+    deps: [generate]
+    cmds:
+      - go run ./cmd/tracker --data ./data
+
+  demo:
+    desc: Run on a temporary copy of the sample data
+    deps: [generate]
+    cmds:
+      - go run ./cmd/tracker --demo
+
+  test:
+    desc: Run all tests
+    deps: [generate]
+    cmds:
+      - go test ./...
+
+  lint:
+    desc: go vet
+    cmds:
+      - go vet ./...
+
+  build:
+    desc: Build dist/tracker(.exe) for this machine
+    deps: [generate]
+    cmds:
+      - go build -trimpath -ldflags "{{.LDFLAGS}}" -o dist/tracker{{exeExt}} ./cmd/tracker
+
+  release:
+    desc: Cross-compile for Windows, macOS and Linux (amd64 + arm64)
+    deps: [generate]
+    cmds:
+      - for:
+          matrix:
+            OS: [windows, darwin, linux]
+            ARCH: [amd64, arm64]
+        task: build-target
+        vars: { OS: '{{.ITEM.OS}}', ARCH: '{{.ITEM.ARCH}}' }
+
+  build-target:
+    internal: true
+    env: { GOOS: '{{.OS}}', GOARCH: '{{.ARCH}}', CGO_ENABLED: '0' } # per-command env, never `go env -w`
+    cmds:
+      - go build -trimpath -ldflags "{{.LDFLAGS}}" -o dist/tracker-{{.OS}}-{{.ARCH}}{{if eq .OS "windows"}}.exe{{end}} ./cmd/tracker

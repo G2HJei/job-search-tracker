@@ -1,0 +1,84 @@
+schemaVersion: 1
+id: 2026-09-12-bramblewood-analytics-engineering-lead-data-platform
+createdAt: 2026-09-12T09:25:00+01:00
+updatedAt: 2026-10-07T09:40:00+01:00
+priority: high
+status: offer
+companyId: bramblewood-analytics
+job:
+  title: Engineering Lead, Data Platform
+  postingUrl: https://bramblewood-analytics.example/jobs/engineering-lead-data-platform
+  jobId: BW-EL-05
+  department: Data Platform
+  location: Manchester (hybrid, 1 day a week) or remote UK
+  keyRequirements: |
+    - Has led a team of 4–8 engineers
+    - Streaming data platforms (Kafka, ClickHouse)
+    - Still hands-on: about 40% of the time writing code
+  fit: 4
+  interest: 5
+  channel: Recruiter (inbound)
+  cvVersion: cv-lead-v1.pdf
+  advertisedSalary: { min: 95000, max: 115000, currency: GBP, period: year }
+contacts:
+  recruiters:
+    - name: Bethany Kerr
+      role: Talent Acquisition Lead
+      email: bethany.kerr@bramblewood-analytics.example
+      linkedin: https://www.linkedin.com/in/fake-bethany-kerr
+  hiringManager:
+    name: Nikhil Desai
+    role: Head of Data Platform
+    email: nikhil.desai@bramblewood-analytics.example
+    phone: +44 7700 900781
+  interviewers:
+    - { name: Nikhil Desai, role: Head of Data Platform }
+    - { name: Lewis Hartley, role: Senior Data Engineer }
+    - name: Amara Osei
+      role: CTO
+      linkedin: https://www.linkedin.com/in/fake-amara-osei
+process:
+  nextStep: Reply to the offer with a counter (base or equity)
+  nextStepDate: 2026-10-09
+  lastContactDate: 2026-10-07
+  dateApplied: 2026-09-12
+  screeningDate: 2026-09-15T13:00
+  interviews:
+    - date: 2026-09-22T10:00
+      type: Case study
+      interviewers: [Nikhil Desai, Lewis Hartley]
+      notes: |
+        Presented a plan to move nightly batch jobs to streaming. Good discussion about team rituals.
+    - date: 2026-09-29T14:30
+      type: Final
+      interviewers: [Amara Osei, Nikhil Desai]
+      notes: Leadership scenarios and a culture conversation with the CTO.
+  offerDate: 2026-10-07
+  qa:
+    - round: 0
+      question: Why move from IC to lead now?
+      answer: |
+        I've been informally leading the ledger migration. I want the accountability, and time to coach.
+    - round: 2
+      question: Tell us about a time you handled under-performance on your team.
+      answer: |
+        The on-call rota story: clear expectations, weekly check-ins, pairing, and a written outcome
+        after six weeks.
+  decision: Pending
+  offerResponseDeadline: 2026-10-14
+compensation:
+  asked: { min: 110000, currency: GBP, period: year }
+  offered: { min: 105000, currency: GBP, period: year, note: verbal offer; written offer to follow }
+  contractType: Permanent
+  bonus: 10% target, paid annually
+  equity: 0.08% options, 4-year vest with a 1-year cliff
+  benefits: |
+    - 30 days holiday plus bank holidays
+    - Private medical insurance (family cover)
+    - 6% pension match
+    - £1,500 yearly learning budget
+  noticePeriod: 1 month
+other:
+  notes: |
+    Counter at £112k base, or keep £105k with 0.12% equity.
+    Try to decide after the Larkspur final on 13 Oct and before the 14 Oct deadline.

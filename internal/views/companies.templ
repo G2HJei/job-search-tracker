@@ -1,0 +1,144 @@
+package views
+
+import (
+	"strconv"
+
+	"github.com/G2HJei/job-search-tracker/internal/model"
+	"github.com/G2HJei/job-search-tracker/internal/views/components"
+	"github.com/G2HJei/job-search-tracker/internal/views/sections"
+)
+
+templ CompaniesPage(p Page, cfg model.Config, rows []CompanyRow) {
+	@Layout(p) {
+		<div class="page-head">
+			<h1>Companies</h1>
+			<a href="/companies/new" role="button">+ New company</a>
+		</div>
+		if len(rows) == 0 {
+			<article class="empty-state">
+				<p>No companies yet. They are created when you add an application, or here.</p>
+			</article>
+		} else {
+			<div class="table-wrap">
+				<table class="striped">
+					<thead>
+						<tr>
+							<th>Company</th>
+							<th>Industry</th>
+							<th>Size</th>
+							<th>HQ</th>
+							<th>Website</th>
+							<th class="num">Active</th>
+							<th class="num">Total</th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, r := range rows {
+							<tr>
+								<td><a href={ "/companies/" + r.Company.ID }>{ r.Company.Name }</a></td>
+								<td>{ r.Company.Industry }</td>
+								<td>
+									if r.Company.Size != "" {
+										@components.Value(r.Company.Size, cfg.CompanySizes)
+									}
+								</td>
+								<td>{ r.Company.HQ }</td>
+								<td>
+									if r.Company.Website != "" {
+										@components.ExtLink(r.Company.Website, hostOf(r.Company.Website))
+									}
+								</td>
+								<td class="num">{ strconv.Itoa(r.Active) }</td>
+								<td class="num">{ strconv.Itoa(r.Total) }</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		}
+	}
+}
+
+templ CompanyPage(p Page, d CompanyData) {
+	@Layout(p) {
+		{{ c := d.Company }}
+		<div class="page-head">
+			<hgroup>
+				<h1>{ c.Name }</h1>
+				<p class="muted">
+					{ c.Industry }
+					if c.HQ != "" {
+						· { c.HQ }
+					}
+				</p>
+			</hgroup>
+			<a href={ "/companies/" + c.ID + "/edit" } role="button" class="secondary outline">Edit</a>
+		</div>
+		<article>
+			<dl class="fields">
+				<dt>Company size</dt>
+				<dd>
+					if c.Size != "" {
+						@components.Value(c.Size, d.Config.CompanySizes)
+					} else {
+						<span class="muted">–</span>
+					}
+				</dd>
+				<dt>Website</dt>
+				<dd>
+					if c.Website != "" {
+						@components.ExtLink(c.Website, c.Website)
+					} else {
+						<span class="muted">–</span>
+					}
+				</dd>
+				if c.Notes != "" {
+					<dt>Notes</dt>
+					<dd>
+						@components.Markdown(c.Notes)
+					</dd>
+				}
+			</dl>
+		</article>
+		<div class="page-head">
+			<h2>Applications</h2>
+			<a href={ "/applications/new?company=" + queryEscape(c.Name) } role="button" class="secondary outline small">+ New application here</a>
+		</div>
+		if len(d.Rows) == 0 {
+			<p class="muted">No applications to this company yet.</p>
+		} else {
+			@RowsTable(d.Config, d.Rows, d.Today)
+		}
+	}
+}
+
+templ CompanyFormPage(p Page, d CompanyFormData) {
+	@Layout(p) {
+		<article class="narrow">
+			<header>
+				if d.New {
+					<h1>New company</h1>
+				} else {
+					<h1>Edit { d.Company.Name }</h1>
+				}
+			</header>
+			<form method="post" action={ companyFormAction(d) }>
+				<input type="hidden" name="rev" value={ d.Rev }/>
+				if d.Error != "" {
+					<p class="form-error" role="alert">{ d.Error }</p>
+				} else if len(d.Errors) > 0 {
+					<p class="form-error" role="alert">Please fix the highlighted fields.</p>
+				}
+				@sections.CompanyFields(d.Company, d.Config, d.Industries, d.Errors)
+				<div class="form-actions">
+					<button type="submit">Save</button>
+					if d.New {
+						<a href="/companies" role="button" class="secondary outline">Cancel</a>
+					} else {
+						<a href={ "/companies/" + d.Company.ID } role="button" class="secondary outline">Cancel</a>
+					}
+				</div>
+			</form>
+		</article>
+	}
+}

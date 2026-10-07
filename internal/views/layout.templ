@@ -1,0 +1,101 @@
+package views
+
+import "strconv"
+
+templ Layout(p Page) {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<meta charset="utf-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<meta name="color-scheme" content="light dark"/>
+			<meta name="htmx-config" content={ htmxConfig }/>
+			<title>{ p.Title } · Job Search Tracker</title>
+			<link rel="icon" href={ p.asset("favicon.svg") } type="image/svg+xml"/>
+			<link rel="stylesheet" href={ p.asset("vendor/pico.min.css") }/>
+			<link rel="stylesheet" href={ p.asset("css/app.css") }/>
+			<script src={ p.asset("vendor/htmx.min.js") } defer></script>
+			if p.Board {
+				<script src={ p.asset("vendor/Sortable.min.js") } defer></script>
+			}
+			<script src={ p.asset("js/app.js") } defer></script>
+		</head>
+		<body>
+			<header class="topbar">
+				<nav class="container-fluid">
+					<ul>
+						<li><a href="/" class="brand"><strong>Job Search Tracker</strong></a></li>
+					</ul>
+					<ul class="nav-links">
+						@navLink(p, "dashboard", "/", "Dashboard")
+						@navLink(p, "applications", "/applications", "Applications")
+						@navLink(p, "board", "/board", "Board")
+						@navLink(p, "calendar", "/calendar", "Calendar")
+						@navLink(p, "companies", "/companies", "Companies")
+						@navLink(p, "cv", "/cv", "CV")
+						@navLink(p, "settings", "/settings", "Settings")
+					</ul>
+					<ul>
+						<li>
+							<form action="/applications" method="get" role="search" class="nav-search">
+								<input type="search" name="q" value={ p.Query } placeholder="Search  /" aria-label="Search applications" id="global-search"/>
+							</form>
+						</li>
+						<li><a href="/applications/new" role="button" class="new-btn" title="New application (n)">+ New application</a></li>
+					</ul>
+				</nav>
+			</header>
+			<main class={ templ.KV("container", !p.Wide), templ.KV("container-fluid", p.Wide) } id="main">
+				if p.LoadErrors > 0 || len(p.Warnings) > 0 {
+					@problemBanner(p)
+				}
+				{ children... }
+			</main>
+			<div id="toasts" aria-live="polite"></div>
+		</body>
+	</html>
+}
+
+templ navLink(p Page, key, href, label string) {
+	<li>
+		if p.Nav == key {
+			<a href={ href } aria-current="page">{ label }</a>
+		} else {
+			<a href={ href }>{ label }</a>
+		}
+	</li>
+}
+
+templ problemBanner(p Page) {
+	<div class="banner" role="alert">
+		if p.LoadErrors > 0 {
+			<p>
+				<strong>
+					if p.LoadErrors == 1 {
+						1 file could not be loaded.
+					} else {
+						{ strconv.Itoa(p.LoadErrors) } files could not be loaded.
+					}
+				</strong>
+				They are skipped and never overwritten. Fix them, then reload. <a href="/settings">Details</a>
+			</p>
+		}
+		for _, w := range p.Warnings {
+			<p>{ w }</p>
+		}
+		<form method="post" action="/settings/reload" class="inline-form">
+			<button type="submit" class="secondary small">Reload from disk</button>
+		</form>
+	</div>
+}
+
+// ErrorPage shows an error with a way back.
+templ ErrorPage(p Page, status int, message string) {
+	@Layout(p) {
+		<article class="error-page">
+			<h1>{ strconv.Itoa(status) } · { p.Title }</h1>
+			<p>{ message }</p>
+			<p><a href="/">Back to the dashboard</a></p>
+		</article>
+	}
+}

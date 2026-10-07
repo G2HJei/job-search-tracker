@@ -1,0 +1,128 @@
+schemaVersion: 1
+id: 2026-08-18-larkspur-payments-senior-backend-engineer-payments-core
+createdAt: 2026-08-18T12:20:00+01:00
+updatedAt: 2026-10-02T18:05:00+01:00
+priority: high
+status: interviewing
+companyId: larkspur-payments
+job:
+  title: Senior Backend Engineer, Payments Core
+  postingUrl: https://larkspur-payments.example/careers/eng-0457
+  jobId: ENG-0457
+  department: Payments Core
+  location: London (hybrid, 2 days)
+  keyRequirements: |
+    - 5+ years building backend services in Go or Java
+    - Double-entry ledgers and idempotent APIs
+    - PostgreSQL at scale (partitioning, logical replication)
+    - Kubernetes and on-call experience
+  fit: 5
+  interest: 5
+  channel: Referral
+  cvVersion: cv-backend-v3.pdf
+  extraMaterials:
+    - cover-letter.md
+    - https://code.example.org/demo-candidate/ledger-sim
+  advertisedSalary: { min: 90000, max: 110000, currency: GBP, period: year, note: plus up to 15% bonus }
+contacts:
+  referrer:
+    name: Priya Raman
+    role: Staff Engineer
+    email: priya.raman@example.com
+    linkedin: https://www.linkedin.com/in/fake-priya-raman
+    notes: Former colleague; submitted the internal referral on 19 Aug.
+  recruiters:
+    - name: Tom Ashdown
+      role: Senior Talent Partner
+      email: tom.ashdown@larkspur-payments.example
+      phone: +44 7700 900312
+      linkedin: https://www.linkedin.com/in/fake-tom-ashdown
+  hiringManager:
+    name: Grace Adeyemi
+    role: Engineering Manager, Payments Core
+    email: grace.adeyemi@larkspur-payments.example
+  interviewers:
+    - { name: Ollie Brandt, role: Senior Engineer }
+    - { name: Sofia Lindqvist, role: Principal Engineer }
+    - { name: Grace Adeyemi, role: Engineering Manager }
+    - name: Rafael Moreno
+      role: VP Engineering
+      linkedin: https://www.linkedin.com/in/fake-rafael-moreno
+process:
+  nextStep: Submit take-home (reconciliation service)
+  nextStepDate: 2026-10-09
+  lastContactDate: 2026-09-25
+  dateApplied: 2026-08-20
+  screeningDate: 2026-08-27T10:00
+  interviews:
+    - date: 2026-09-09T14:00
+      type: Technical
+      interviewers: [Ollie Brandt]
+      notes: |
+        Live coding in Go: idempotent transfer endpoint. Went well; discussed retries and the outbox pattern.
+    - date: 2026-09-23T11:00
+      type: System design
+      interviewers: [Sofia Lindqvist, Grace Adeyemi]
+      notes: |
+        Designed a payouts scheduler. They pushed on failure modes and reconciliation with the bank file.
+    - date: 2026-10-13T14:00
+      type: Final
+      interviewers: [Rafael Moreno, Grace Adeyemi]
+      notes: Values interview plus a walkthrough of the take-home. 90 minutes, London office.
+  followUpDate: 2026-10-21
+  qa:
+    - round: 0
+      question: Why are you looking to move now?
+      answer: |
+        I want to work on money movement at a larger scale, with a team that writes things down.
+    - round: 0
+      question: What are your salary expectations?
+      answer: |
+        Gave a range of £95–105k base; Tom said that fits the band.
+    - round: 1
+      question: How do you make a POST endpoint idempotent?
+      answer: |
+        Client-supplied idempotency key stored with the request hash and the response, in the same
+        transaction as the side effect. A replay returns the stored response; a different body with
+        the same key returns 422.
+    - round: 1
+      question: What would you test first?
+      answer: |
+        Concurrent duplicate requests (two goroutines, same key) and a crash right after the ledger write.
+    - round: 2
+      question: How do you reconcile internal payouts against the bank's settlement file?
+      answer: |
+        - Load the file into a staging table keyed by bank reference
+        - Match on reference, amount and currency; park mismatches in an exceptions queue
+        - Daily report with ageing buckets; alert if more than 0.1% of volume is unmatched
+    - round: 2
+      question: What happens if the scheduler crashes halfway through a batch?
+      answer: |
+        Each payout is its own state machine with a lease. A restarted worker picks up expired
+        leases, and the bank call uses the payout ID as the idempotency key.
+    - round: 3
+      question: What will I ask Rafael in the final?
+      answer: |
+        - How often does on-call page, and how is it compensated?
+        - What does success look like for this role after six months?
+        - How are build-vs-buy decisions made for the ledger?
+  takeHome:
+    details: |
+      Build a small reconciliation service in Go:
+      - Read two CSV files (internal payouts and a bank statement)
+      - Output matched, unmatched and suspicious rows as JSON
+      - Include tests and a short README on trade-offs
+
+      Time box: about 4 hours. Submit a private repo link through the candidate portal.
+    deadline: 2026-10-09T18:00
+  decision: Pending
+compensation:
+  asked: { min: 95000, max: 105000, currency: GBP, period: year }
+  contractType: Permanent
+  bonus: Up to 15% annual, based on company and personal targets
+  equity: RSUs (amount confirmed at offer stage)
+  noticePeriod: 1 month
+other:
+  notes: |
+    Priya says the team is 7 engineers in a Go monorepo and deploys several times a day.
+    The final round is in person, so book a morning train.

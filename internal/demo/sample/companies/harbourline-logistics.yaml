@@ -1,0 +1,9 @@
+schemaVersion: 1
+id: harbourline-logistics
+name: Harbourline Logistics
+industry: Logistics
+size: "1001-5000"
+hq: Southampton, UK
+website: https://careers.harbourline.example
+notes: |
+  Large freight and last-mile operator. Very slow HR process; expect weeks between steps.

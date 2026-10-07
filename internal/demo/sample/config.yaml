@@ -1,0 +1,24 @@
+schemaVersion: 1
+defaultCurrency: GBP          # change to your currency
+staleAfterDays: 14            # active applications with no contact for this long are flagged
+upcomingDays: 14              # dashboard horizon
+priorities:                   # id is stored in application files; label/color are display-only
+  - { id: high,   label: High,   color: red }
+  - { id: medium, label: Medium, color: amber }
+  - { id: low,    label: Low,    color: grey }
+statuses:                     # order = kanban column order; closed = hidden from "active" views
+  - { id: wishlist,     label: Wishlist }
+  - { id: applied,      label: Applied }
+  - { id: screening,    label: Screening }
+  - { id: interviewing, label: Interviewing }
+  - { id: offer,        label: Offer }
+  - { id: accepted,     label: Accepted,    closed: true }
+  - { id: rejected,     label: Rejected,    closed: true }
+  - { id: withdrawn,    label: Withdrawn,   closed: true }
+  - { id: ghosted,      label: No response, closed: true }
+channels:       [Company website, LinkedIn, Referral, Recruiter (inbound), Recruitment agency, Job board, Other]
+contractTypes:  [Permanent, Fixed-term, Contractor, Freelance, Part-time, Internship]
+decisions:      [Pending, Offer accepted, Offer declined, Rejected by company, Withdrew]
+companySizes:   ["1-10", "11-50", "51-200", "201-1000", "1001-5000", "5000+"]
+interviewTypes: [Phone screen, Technical, System design, Behavioural, Case study, Panel, Final, Other]
+salaryPeriods:  [year, month, day, hour]

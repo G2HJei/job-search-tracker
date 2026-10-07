@@ -1,0 +1,180 @@
+package components
+
+import (
+	"strconv"
+
+	"github.com/G2HJei/job-search-tracker/internal/model"
+)
+
+// StatusPill shows a status label. Statuses missing from config.yaml are
+// kept and shown as-is with a warning style.
+templ StatusPill(cfg *model.Config, id string) {
+	if s, ok := cfg.Status(id); ok {
+		<span class={ "pill", "status-" + s.ID, templ.KV("closed", s.Closed) }>{ s.Label }</span>
+	} else if id != "" {
+		<span class="pill unknown" title="Not in config.yaml">{ id }</span>
+	}
+}
+
+// PriorityPill shows a priority in its configured color.
+templ PriorityPill(cfg *model.Config, id string) {
+	if p, ok := cfg.Priority(id); ok {
+		<span class={ "pill", "color-" + p.Color }>{ p.Label }</span>
+	} else if id != "" {
+		<span class="pill unknown" title="Not in config.yaml">{ id }</span>
+	}
+}
+
+// Value shows a config-list value (channel, contract type, …); values
+// missing from config.yaml get a warning style.
+templ Value(value string, options []string) {
+	if model.Has(options, value) {
+		{ value }
+	} else {
+		<span class="unknown-value" title="Not in config.yaml">{ value }</span>
+	}
+}
+
+// Rating shows 1–5 stars, or a dash when unset.
+templ Rating(n int) {
+	if n > 0 {
+		<span class="rating" title={ strconv.Itoa(n) + " of 5" } aria-label={ strconv.Itoa(n) + " of 5" }>{ Stars(n) }</span>
+	} else {
+		<span class="muted">–</span>
+	}
+}
+
+templ ErrorText(err string) {
+	if err != "" {
+		<small class="error">{ err }</small>
+	}
+}
+
+// ExtLink opens in a new tab without sending the app's URL as referrer.
+templ ExtLink(url, text string) {
+	<a href={ url } target="_blank" rel="noopener noreferrer">{ text }</a>
+}
+
+templ Input(label, typ, name, value, err string, attrs templ.Attributes) {
+	<label>
+		{ label }
+		<input type={ typ } name={ name } value={ value } { attrs... } { Invalid(err)... }/>
+		@ErrorText(err)
+	</label>
+}
+
+templ TextArea(label, name, value, err string, rows int) {
+	<label>
+		{ label }
+		<textarea name={ name } rows={ strconv.Itoa(rows) } { Invalid(err)... }>{ value }</textarea>
+		@ErrorText(err)
+	</label>
+}
+
+templ Select(label, name, value string, opts []Option, err, blank string) {
+	<label>
+		{ label }
+		@SelectOnly(name, value, opts, blank, Invalid(err))
+		@ErrorText(err)
+	</label>
+}
+
+// SelectOnly renders a bare select. A blank option is added when blank is
+// set or the current value is empty.
+templ SelectOnly(name, value string, opts []Option, blank string, attrs templ.Attributes) {
+	<select name={ name } { attrs... }>
+		if blank != "" || value == "" {
+			<option value="">{ blank }</option>
+		}
+		for _, o := range withCurrent(opts, value) {
+			<option value={ o.Value } selected?={ o.Value == value }>{ o.Label }</option>
+		}
+	</select>
+}
+
+templ RatingInput(label, name string, value int, err string) {
+	<fieldset class="rating-input">
+		<legend>{ label }</legend>
+		for i := 0; i <= 5; i++ {
+			<label>
+				<input type="radio" name={ name } value={ strconv.Itoa(i) } checked?={ value == i }/>
+				{ ratingLabel(i) }
+			</label>
+		}
+		@ErrorText(err)
+	</fieldset>
+}
+
+templ DateInput(label, name string, v model.Date, err string, todayButton bool) {
+	<label>
+		{ label }
+		if todayButton {
+			<span role="group" class="with-button">
+				<input type="date" name={ name } value={ v.FormValue() } { Invalid(err)... }/>
+				<button type="button" class="secondary" data-today={ name }>Today</button>
+			</span>
+		} else {
+			<input type="date" name={ name } value={ v.FormValue() } { Invalid(err)... }/>
+		}
+		@ErrorText(err)
+	</label>
+}
+
+templ DateTimeInput(label, name string, v model.DateTime, err string) {
+	<label>
+		{ label }
+		<input type="datetime-local" name={ name } value={ v.FormValue() } { Invalid(err)... }/>
+		@ErrorText(err)
+	</label>
+}
+
+// SalaryInput edits a SalaryRange; fields are named <prefix>_min, _max,
+// _currency, _period and _note.
+templ SalaryInput(legend, prefix string, s model.SalaryRange, cfg *model.Config, err string) {
+	<fieldset class="salary">
+		<legend>{ legend }</legend>
+		<div class="salary-grid">
+			<input type="number" name={ prefix + "_min" } value={ IntValue(s.Min) } min="0" step="1" placeholder="Min" aria-label="Minimum" { Invalid(err)... }/>
+			<input type="number" name={ prefix + "_max" } value={ IntValue(s.Max) } min="0" step="1" placeholder="Max" aria-label="Maximum" { Invalid(err)... }/>
+			<input type="text" name={ prefix + "_currency" } value={ orDefault(s.Currency, cfg.DefaultCurrency) } maxlength="3" aria-label="Currency"/>
+			@SelectOnly(prefix+"_period", orDefault(s.Period, "year"), Strings(cfg.SalaryPeriods), "", templ.Attributes{"aria-label": "Period"})
+		</div>
+		<input type="text" name={ prefix + "_note" } value={ s.Note } placeholder="Note, e.g. DOE or +10% bonus" aria-label="Note"/>
+		@ErrorText(err)
+	</fieldset>
+}
+
+// ContactFields edits one contact; fields are named <prefix>_name etc.
+// key is the error key prefix, e.g. "contacts.recruiters.0".
+templ ContactFields(prefix string, c model.Contact, errs model.FieldErrors, key string) {
+	<div class="contact-grid">
+		@Input("Name", "text", prefix+"_name", c.Name, errs.Get(key+".name"), nil)
+		@Input("Role", "text", prefix+"_role", c.Role, "", nil)
+		@Input("Email", "email", prefix+"_email", c.Email, "", nil)
+		@Input("Phone", "tel", prefix+"_phone", c.Phone, "", nil)
+		@Input("LinkedIn", "url", prefix+"_linkedin", c.LinkedIn, errs.Get(key+".linkedin"), templ.Attributes{"placeholder": "https://www.linkedin.com/in/…"})
+	</div>
+	@TextArea("Notes", prefix+"_notes", c.Notes, "", 2)
+}
+
+// ContactView shows one contact as a compact card.
+templ ContactView(c model.Contact) {
+	<div class="contact">
+		<strong>{ c.Name }</strong>
+		if c.Role != "" {
+			<span class="muted">· { c.Role }</span>
+		}
+		<div class="contact-links">
+			if c.Email != "" {
+				<a href={ "mailto:" + c.Email }>{ c.Email }</a>
+			}
+			if c.Phone != "" {
+				<a href={ "tel:" + c.Phone }>{ c.Phone }</a>
+			}
+			if c.LinkedIn != "" {
+				@ExtLink(c.LinkedIn, "LinkedIn")
+			}
+		</div>
+		@Markdown(c.Notes)
+	</div>
+}

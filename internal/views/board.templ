@@ -1,0 +1,60 @@
+package views
+
+import (
+	"strconv"
+
+	"github.com/G2HJei/job-search-tracker/internal/views/components"
+)
+
+templ BoardPage(p Page, b BoardData) {
+	@Layout(p) {
+		<div class="page-head">
+			<h1>Board</h1>
+			<p class="muted small">Drag a card to another column to change its status.</p>
+		</div>
+		<div class="board">
+			for _, col := range b.Columns {
+				<section class={ "board-column", templ.KV("closed", col.Status.Closed) }>
+					<header>
+						if col.Known {
+							<h2>{ col.Status.Label }</h2>
+						} else {
+							<h2 class="unknown-value" title="Not in config.yaml">{ col.Status.Label }</h2>
+						}
+						<span class="count" data-count>{ strconv.Itoa(len(col.Rows)) }</span>
+					</header>
+					<div class="board-cards" data-status={ col.Status.ID } data-sortable?={ col.Known }>
+						for _, r := range col.Rows {
+							@boardCard(b, r)
+						}
+					</div>
+				</section>
+			}
+		</div>
+	}
+}
+
+templ boardCard(b BoardData, r Row) {
+	{{ a := r.App }}
+	<article class="board-card" data-id={ a.ID }>
+		<a href={ "/applications/" + a.ID } class="card-link">
+			<strong>{ r.Company }</strong>
+			<span>{ a.Job.Title }</span>
+		</a>
+		<div class="card-meta">
+			@components.PriorityPill(&b.Config, a.Priority)
+			if !a.Process.NextStepDate.IsZero() {
+				<span class={ "small", templ.KV("overdue", isOverdue(b.Config, a, b.Today)) } title={ a.Process.NextStep }>
+					{ components.ShortDate(a.Process.NextStepDate, b.Today) }
+				</span>
+			}
+		</div>
+		<noscript>
+			<form method="post" action={ "/applications/" + a.ID + "/status" } class="inline-form">
+				<input type="hidden" name="return" value="/board"/>
+				@components.SelectOnly("status", a.Status, components.Statuses(&b.Config), "", templ.Attributes{"aria-label": "Status"})
+				<button type="submit" class="small">Move</button>
+			</form>
+		</noscript>
+	</article>
+}

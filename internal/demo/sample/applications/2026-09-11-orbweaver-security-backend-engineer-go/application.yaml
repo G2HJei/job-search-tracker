@@ -1,0 +1,41 @@
+schemaVersion: 1
+id: 2026-09-11-orbweaver-security-backend-engineer-go
+createdAt: 2026-09-11T10:05:00+01:00
+updatedAt: 2026-09-18T14:45:00+01:00
+priority: low
+status: applied
+companyId: orbweaver-security
+job:
+  title: Backend Engineer (Go)
+  postingUrl: https://orbweaver-security.example/careers/backend-go
+  department: Threat Intel Platform
+  location: Remote (EU/UK), quarterly offsite in Amsterdam
+  keyRequirements: |
+    - Go, gRPC, PostgreSQL
+    - Ingestion pipelines for large volumes of log data
+    - Security mindset; experience with threat-intel feeds is a bonus
+  fit: 3
+  interest: 4
+  channel: LinkedIn
+  cvVersion: cv-backend-v3.pdf
+  advertisedSalary: { min: 6200, max: 7400, currency: EUR, period: month, note: excl. 8% holiday allowance }
+contacts:
+  recruiters:
+    - name: Femke de Vries
+      role: People & Talent
+      email: femke@orbweaver-security.example
+      linkedin: https://www.linkedin.com/in/fake-femke-de-vries
+process:
+  nextStep: Chase Femke if there is still no news
+  nextStepDate: 2026-10-02
+  lastContactDate: 2026-09-18
+  dateApplied: 2026-09-12
+  followUpDate: 2026-09-17
+compensation:
+  asked: { min: 7000, currency: EUR, period: month }
+  contractType: Permanent
+  noticePeriod: 1 month
+other:
+  notes: |
+    Followed up on 17 Sep; Femke replied on 18 Sep that the team reviews applications in batches.
+    Working remotely from the UK would go through an employer of record.

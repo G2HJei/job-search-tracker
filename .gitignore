@@ -1,0 +1,14 @@
+# Personal data: never commit it (see README).
+/data/
+
+# Build output
+/dist/
+/tmp/
+*.exe
+
+# IDE
+.idea/workspace.xml
+.idea/shelf/
+
+# Browser automation artefacts
+/.playwright-mcp/

@@ -1,0 +1,10 @@
+schemaVersion: 1
+id: bramblewood-analytics
+name: Bramblewood Analytics
+industry: Data & analytics SaaS
+size: "51-200"
+hq: Manchester, UK
+website: https://bramblewood-analytics.example
+notes: |
+  Series B, product analytics for retailers. Data platform on Kafka + ClickHouse.
+  Hiring manager suggested the lead role after the first senior interview.

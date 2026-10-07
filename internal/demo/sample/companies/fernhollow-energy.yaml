@@ -1,0 +1,9 @@
+schemaVersion: 1
+id: fernhollow-energy
+name: Fernhollow Energy
+industry: Renewable energy
+size: "201-1000"
+hq: Edinburgh, UK
+website: https://fernhollow-energy.example
+notes: |
+  Community wind and solar co-op. Platform team is small and pragmatic.

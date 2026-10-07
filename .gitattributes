@@ -1,0 +1,8 @@
+# LF everywhere so YAML fixtures, golden files and embedded data are identical
+# on every OS (this machine's Git has core.autocrlf=true).
+* text=auto eol=lf
+*.pdf binary
+*.png binary
+*.exe binary
+
+*_templ.go linguist-generated=true

@@ -1,0 +1,14 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="tracker (debug)" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="job-search-tracker" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="--data ./data --dev" />
+    <kind value="PACKAGE" />
+    <package value="github.com/G2HJei/job-search-tracker/cmd/tracker" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/cmd/tracker/main.go" />
+    <method v="2">
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="templ generate" run_configuration_type="ShConfigurationType" />
+    </method>
+  </configuration>
+</component>

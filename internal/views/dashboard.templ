@@ -1,0 +1,155 @@
+package views
+
+import (
+	"net/url"
+	"strconv"
+
+	"github.com/G2HJei/job-search-tracker/internal/model"
+	"github.com/G2HJei/job-search-tracker/internal/views/components"
+)
+
+templ DashboardPage(p Page, d DashboardData) {
+	@Layout(p) {
+		<div class="page-head">
+			<h1>Dashboard</h1>
+			<p class="muted">
+				{ d.Today.Format("Monday 2 January 2006") } · { strconv.Itoa(d.Active) } active of { strconv.Itoa(d.Total) } applications
+			</p>
+		</div>
+		if d.Total == 0 {
+			<article class="empty-state">
+				<h2>No applications yet</h2>
+				<p>Add the first job you're interested in. It takes about 30 seconds.</p>
+				<a href="/applications/new" role="button">+ New application</a>
+			</article>
+		} else {
+			<div class="dashboard">
+				<div>
+					<section>
+						<h2>Overdue <span class="count">{ strconv.Itoa(len(d.Overdue)) }</span></h2>
+						if len(d.Overdue) == 0 {
+							<p class="muted">Nothing overdue.</p>
+						} else {
+							<ul class="events">
+								for _, e := range d.Overdue {
+									@eventItem(e, d.Titles, d.Today, true)
+								}
+							</ul>
+						}
+					</section>
+					<section>
+						<h2>Upcoming <span class="muted small">next { strconv.Itoa(d.Config.UpcomingDays) } days</span></h2>
+						if len(d.Upcoming) == 0 {
+							<p class="muted">Nothing scheduled in the next { strconv.Itoa(d.Config.UpcomingDays) } days.</p>
+						} else {
+							@agenda(d.Upcoming, d.Titles, d.Today)
+						}
+					</section>
+				</div>
+				<div>
+					<section>
+						<h2>Needs follow-up <span class="count">{ strconv.Itoa(len(d.Stale)) }</span></h2>
+						if len(d.Stale) == 0 {
+							<p class="muted">Every active application has recent contact or something scheduled.</p>
+						} else {
+							<ul class="events stale">
+								for _, s := range d.Stale {
+									@staleItem(s, d.Titles)
+								}
+							</ul>
+						}
+					</section>
+					<section>
+						<h2>Pipeline</h2>
+						@pipeline(d)
+					</section>
+				</div>
+			</div>
+		}
+	}
+}
+
+templ eventItem(e model.AppEvent, titles map[string]string, today model.Date, overdue bool) {
+	<li class={ "event", "kind-" + string(e.Kind), templ.KV("highlight", e.Kind.Highlight()), templ.KV("overdue", overdue) }>
+		<span class="when">
+			if overdue {
+				{ components.ShortDate(e.Date(), today) } · { components.Relative(e.Date(), today) }
+			} else if e.When.HasTime() {
+				{ e.When.Clock() }
+			} else {
+				<span class="muted">all day</span>
+			}
+		</span>
+		<span class="what">
+			<a href={ "/applications/" + e.App.ID }>{ titles[e.App.ID] }</a>
+			<span class="label">{ e.Label }</span>
+		</span>
+	</li>
+}
+
+templ agenda(days []model.DayEvents, titles map[string]string, today model.Date) {
+	for _, day := range days {
+		<div class="day">
+			<h3 class={ templ.KV("today", day.Day == today) }>
+				{ components.DayHeading(day.Day, today) }
+				<span class="muted small">{ components.Relative(day.Day, today) }</span>
+			</h3>
+			<ul class="events">
+				for _, e := range day.Events {
+					@eventItem(e, titles, today, false)
+				}
+			</ul>
+		</div>
+	}
+}
+
+templ staleItem(s model.StaleApp, titles map[string]string) {
+	<li class="event">
+		<span class="what">
+			<a href={ "/applications/" + s.App.ID }>{ titles[s.App.ID] }</a>
+			<span class="label">No contact for { strconv.Itoa(s.Days) } days (since { s.Since.Display() })</span>
+		</span>
+		<form
+			method="post"
+			action={ "/applications/" + s.App.ID + "/touch" }
+			hx-post={ "/applications/" + s.App.ID + "/touch" }
+			hx-target="closest li"
+			hx-swap="outerHTML"
+			class="inline-form"
+		>
+			<input type="hidden" name="ctx" value="dashboard"/>
+			<input type="hidden" name="return" value="/"/>
+			<button type="submit" class="outline small" title="Set last contact date to today">Contacted today</button>
+		</form>
+	</li>
+}
+
+templ pipeline(d DashboardData) {
+	<table class="pipeline">
+		<tbody>
+			for _, sc := range d.Pipeline {
+				<tr class={ templ.KV("closed", sc.Status.Closed) }>
+					<th scope="row">
+						<a href={ "/applications?closed=1&status=" + url.QueryEscape(sc.Status.ID) }>
+							if sc.Known {
+								{ sc.Status.Label }
+							} else {
+								<span class="unknown-value" title="Not in config.yaml">{ sc.Status.Label }</span>
+							}
+						</a>
+					</th>
+					<td class="bar"><progress value={ strconv.Itoa(sc.Count) } max={ strconv.Itoa(max(d.MaxCount, 1)) }></progress></td>
+					<td class="num">{ strconv.Itoa(sc.Count) }</td>
+				</tr>
+			}
+		</tbody>
+	</table>
+	<h3>Conversion</h3>
+	<ol class="funnel">
+		<li><strong>{ strconv.Itoa(d.Funnel.Applied) }</strong> applied</li>
+		<li><strong>{ strconv.Itoa(d.Funnel.Screening) }</strong> screening <span class="muted">{ strconv.Itoa(model.Percent(d.Funnel.Screening, d.Funnel.Applied)) }%</span></li>
+		<li><strong>{ strconv.Itoa(d.Funnel.Interview) }</strong> interview <span class="muted">{ strconv.Itoa(model.Percent(d.Funnel.Interview, d.Funnel.Applied)) }%</span></li>
+		<li><strong>{ strconv.Itoa(d.Funnel.Offer) }</strong> offer <span class="muted">{ strconv.Itoa(model.Percent(d.Funnel.Offer, d.Funnel.Applied)) }%</span></li>
+	</ol>
+	<p class="muted small">Percentages are of applications that reached "applied", counting the furthest stage each one reached.</p>
+}

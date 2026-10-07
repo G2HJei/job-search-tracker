@@ -1,0 +1,27 @@
+schemaVersion: 1
+id: 2026-09-01-harbourline-logistics-backend-engineer-shipment-tracking
+createdAt: 2026-09-01T20:15:00+01:00
+updatedAt: 2026-09-30T09:00:00+01:00
+priority: low
+status: ghosted
+companyId: harbourline-logistics
+job:
+  title: Backend Engineer, Shipment Tracking
+  postingUrl: https://jobs.example.org/listing/88213-harbourline-backend-engineer
+  jobId: HL-2026-1187
+  department: Customer Visibility
+  location: Southampton (office-based, 4 days)
+  fit: 2
+  interest: 2
+  channel: Job board
+  cvVersion: cv-backend-v2.pdf
+  advertisedSalary: { min: 55000, max: 65000, currency: GBP, period: year }
+process:
+  nextStep: Email the careers inbox for an update
+  nextStepDate: 2026-09-16
+  lastContactDate: 2026-09-02
+  dateApplied: 2026-09-02
+  followUpDate: 2026-09-16
+other:
+  notes: |
+    Only an automated acknowledgement on 2 Sep, then silence. Marked as no response on 30 Sep.

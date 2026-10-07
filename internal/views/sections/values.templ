@@ -1,0 +1,106 @@
+package sections
+
+import (
+	"strings"
+
+	"github.com/G2HJei/job-search-tracker/internal/model"
+	"github.com/G2HJei/job-search-tracker/internal/views/components"
+)
+
+templ dateValue(v model.Date, today model.Date) {
+	{ v.Display() }
+	<span class="muted">({ components.Relative(v, today) })</span>
+}
+
+templ dateTimeValue(v model.DateTime, today model.Date) {
+	{ v.Display() }
+	<span class="muted">({ components.Relative(v.Date(), today) })</span>
+}
+
+// fileLink links to an attachment, or flags it if the file is missing.
+templ fileLink(d Data, name string) {
+	if d.HasFile(name) {
+		<a href={ d.FileURL(name) } target="_blank">{ name }</a>
+	} else {
+		<span class="unknown-value" title="Not found in this application's files folder">{ name }</span>
+	}
+}
+
+templ cvLink(name string, exists bool) {
+	if exists {
+		<a href={ "/cv/" + name } target="_blank">{ name }</a>
+	} else {
+		<span class="unknown-value" title="Not found in the CV library">{ name }</span>
+	}
+}
+
+templ materialsList(d Data) {
+	<ul class="plain">
+		for _, m := range d.App.Job.ExtraMaterials {
+			<li>
+				if model.IsURL(m) {
+					@components.ExtLink(m, m)
+				} else {
+					@fileLink(d, m)
+				}
+			</li>
+		}
+	</ul>
+}
+
+templ interviewsList(d Data) {
+	<ol class="interviews">
+		for i, iv := range d.App.Process.Interviews {
+			<li>
+				<strong>Interview { itoa(i + 1) }</strong>
+				if !iv.Date.IsZero() {
+					<span>{ " · " + iv.Date.Display() }</span>
+					<span class="muted">({ components.Relative(iv.Date.Date(), d.Today) })</span>
+				}
+				if iv.Type != "" {
+					<span>{ " · " }</span>
+					@components.Value(iv.Type, d.Config.InterviewTypes)
+				}
+				if len(iv.Interviewers) > 0 {
+					<div class="muted">With { strings.Join(iv.Interviewers, ", ") }</div>
+				}
+				@components.Markdown(iv.Notes)
+			</li>
+		}
+	</ol>
+}
+
+templ qaList(d Data) {
+	for _, round := range qaRounds(d.App.Process.QA) {
+		<details class="qa" open>
+			<summary>{ roundLabel(round) }</summary>
+			for _, q := range QAForRound(d.App.Process.QA, round) {
+				<div class="qa-item">
+					<p class="question">{ q.Question }</p>
+					@components.Markdown(q.Answer)
+				</div>
+			}
+		</details>
+	}
+}
+
+// decisionValue shows the decision and, if it implies a different status,
+// offers a one-click status change. The status is never changed
+// automatically.
+templ decisionValue(d Data) {
+	@components.Value(d.App.Process.Decision, d.Config.Decisions)
+	if s, ok := d.suggestion(); ok {
+		<form
+			method="post"
+			action={ d.appURL() + "/status" }
+			hx-post={ d.appURL() + "/status" }
+			hx-target={ target("process") }
+			hx-swap="outerHTML"
+			class="inline-form suggestion"
+		>
+			<input type="hidden" name="status" value={ s.ID }/>
+			<input type="hidden" name="ctx" value="suggest"/>
+			<button type="submit" class="outline small">Set status to { s.Label }</button>
+		</form>
+	}
+}

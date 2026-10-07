@@ -1,0 +1,12 @@
+schemaVersion: 1
+id: larkspur-payments
+name: Larkspur Payments
+industry: Fintech
+size: "201-1000"
+hq: London, UK
+website: https://larkspur-payments.example
+notes: |
+  Card acquiring and payouts for marketplaces. Go + Postgres shop, event-sourced ledger.
+
+  - Engineering blog posts weekly; good write-ups on idempotency.
+  - Employee reviews (fake) mention a heavy but well-paid on-call rota.
