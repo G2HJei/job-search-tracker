@@ -9,13 +9,13 @@ import (
 templ companyView(d Data) {
 	@viewCard(d, "company") {
 		if d.CompanyFound {
-			<p class="company-name">
+			<p class="company-name" data-edit-field="name">
 				<a href={ "/companies/" + d.Company.ID }><strong>{ d.Company.Name }</strong></a>
 				if d.CompanyApps > 1 {
 					<span class="muted">· { itoa(d.CompanyApps) } applications</span>
 				}
 			</p>
-			@fieldList(companyFields(d))
+			@fieldList(companyFields(d), d.sectionURL("company")+"/edit")
 		} else {
 			<p class="unknown-value">
 				No company record "{ d.App.CompanyID }" (companies/{ d.App.CompanyID }.yaml is missing or could not be loaded).
@@ -68,7 +68,7 @@ templ relinkForm(d Data) {
 // ---- Job ----
 templ jobView(d Data) {
 	@viewCard(d, "job") {
-		@fieldList(jobFields(d))
+		@fieldList(jobFields(d), d.sectionURL("job")+"/edit")
 	}
 }
 
@@ -124,35 +124,35 @@ templ MaterialRow(value, err string) {
 templ contactsView(d Data) {
 	@viewCard(d, "contacts") {
 		{{ c := d.App.Contacts }}
-		{{ var empty []string }}
+		{{ var empty fields }}
 		<div class="contacts">
 			if c.Referrer != nil {
-				@contactGroup("Referrer", []model.Contact{*c.Referrer})
+				@contactGroup("Referrer", "referrer_name", []model.Contact{*c.Referrer})
 			} else {
-				{{ empty = append(empty, "Referrer") }}
+				{{ empty.add("Referrer", "referrer_name", true, nil) }}
 			}
 			if len(c.Recruiters) > 0 {
-				@contactGroup("Recruiters", c.Recruiters)
+				@contactGroup("Recruiters", "recruiter_name", c.Recruiters)
 			} else {
-				{{ empty = append(empty, "Recruiters") }}
+				{{ empty.add("Recruiters", "recruiter_name", true, nil) }}
 			}
 			if c.HiringManager != nil {
-				@contactGroup("Hiring manager", []model.Contact{*c.HiringManager})
+				@contactGroup("Hiring manager", "hm_name", []model.Contact{*c.HiringManager})
 			} else {
-				{{ empty = append(empty, "Hiring manager") }}
+				{{ empty.add("Hiring manager", "hm_name", true, nil) }}
 			}
 			if len(c.Interviewers) > 0 {
-				@contactGroup("Interviewers", c.Interviewers)
+				@contactGroup("Interviewers", "interviewer_name", c.Interviewers)
 			} else {
-				{{ empty = append(empty, "Interviewers") }}
+				{{ empty.add("Interviewers", "interviewer_name", true, nil) }}
 			}
 		</div>
-		@fieldList(fields{empty: empty})
+		@fieldList(empty, d.sectionURL("contacts")+"/edit")
 	}
 }
 
-templ contactGroup(label string, cs []model.Contact) {
-	<div class="contact-group">
+templ contactGroup(label, field string, cs []model.Contact) {
+	<div class="contact-group" data-edit-field={ field }>
 		<h3>{ label }</h3>
 		for _, c := range cs {
 			@components.ContactView(c)
@@ -203,7 +203,18 @@ templ ContactRow(prefix string, c model.Contact, errs model.FieldErrors, key str
 // ---- Hiring process ----
 templ processView(d Data) {
 	@viewCard(d, "process") {
-		@fieldList(processFields(d))
+		@fieldList(processFields(d), d.sectionURL("process")+"/edit")
+	}
+	@processParts(d)
+}
+
+// processParts shows interviews and questions in cards of their own.
+templ processParts(d Data) {
+	@partCard(d, "process", "interviews", "Interviews", "interview_date", len(d.App.Process.Interviews) == 0) {
+		@interviewsList(d)
+	}
+	@partCard(d, "process", "qa", "Questions & answers", "qa_question", len(d.App.Process.QA) == 0) {
+		@qaList(d)
 	}
 }
 
@@ -292,7 +303,7 @@ templ QARow(q model.QA, rounds []RoundOption, questionErr string) {
 // ---- Compensation ----
 templ compensationView(d Data) {
 	@viewCard(d, "compensation") {
-		@fieldList(compensationFields(d))
+		@fieldList(compensationFields(d), d.sectionURL("compensation")+"/edit")
 	}
 }
 
@@ -319,7 +330,7 @@ templ compensationEdit(d Data) {
 // ---- Other ----
 templ otherView(d Data) {
 	@viewCard(d, "other") {
-		@fieldList(otherFields(d))
+		@fieldList(otherFields(d), d.sectionURL("other")+"/edit")
 	}
 }
 

@@ -50,7 +50,7 @@ func (s *Server) board(w http.ResponseWriter, r *http.Request) {
 		})
 	}
 	p := s.page("Board", "board")
-	p.Wide, p.Board = true, true
+	p.Board = true
 	s.render(w, r, http.StatusOK, views.BoardPage(p, b))
 }
 

@@ -23,48 +23,46 @@ templ DashboardPage(p Page, d DashboardData) {
 				<a href="/applications/new" role="button">+ New application</a>
 			</article>
 		} else {
-			<div class="dashboard">
-				<div>
-					<section>
-						<h2>Overdue <span class="count">{ strconv.Itoa(len(d.Overdue)) }</span></h2>
-						if len(d.Overdue) == 0 {
-							<p class="muted">Nothing overdue.</p>
-						} else {
-							<ul class="events">
-								for _, e := range d.Overdue {
-									@eventItem(e, d.Titles, d.Today, true)
-								}
-							</ul>
-						}
-					</section>
-					<section>
-						<h2>Upcoming <span class="muted small">next { strconv.Itoa(d.Config.UpcomingDays) } days</span></h2>
-						if len(d.Upcoming) == 0 {
-							<p class="muted">Nothing scheduled in the next { strconv.Itoa(d.Config.UpcomingDays) } days.</p>
-						} else {
-							@agenda(d.Upcoming, d.Titles, d.Today)
-						}
-					</section>
-				</div>
-				<div>
-					<section>
-						<h2>Needs follow-up <span class="count">{ strconv.Itoa(len(d.Stale)) }</span></h2>
-						if len(d.Stale) == 0 {
-							<p class="muted">Every active application has recent contact or something scheduled.</p>
-						} else {
-							<ul class="events stale">
-								for _, s := range d.Stale {
-									@staleItem(s, d.Titles)
-								}
-							</ul>
-						}
-					</section>
-					<section>
-						<h2>Pipeline</h2>
-						@pipeline(d)
-					</section>
-				</div>
+			<div class="dash-row">
+				<section>
+					<h2>Overdue <span class="count">{ strconv.Itoa(len(d.Overdue)) }</span></h2>
+					if len(d.Overdue) == 0 {
+						<p class="muted">Nothing overdue.</p>
+					} else {
+						<ul class="events">
+							for _, e := range d.Overdue {
+								@eventItem(e, d.Titles, d.Today, true)
+							}
+						</ul>
+					}
+				</section>
+				<section>
+					<h2>Needs follow-up <span class="count">{ strconv.Itoa(len(d.Stale)) }</span></h2>
+					if len(d.Stale) == 0 {
+						<p class="muted">Every active application has recent contact or something scheduled.</p>
+					} else {
+						<ul class="events stale">
+							for _, s := range d.Stale {
+								@staleItem(s, d.Titles)
+							}
+						</ul>
+					}
+				</section>
+				<section>
+					<h2>Pipeline</h2>
+					@pipeline(d)
+				</section>
 			</div>
+			<section>
+				<h2>Upcoming <span class="muted small">next { strconv.Itoa(d.Config.UpcomingDays) } days</span></h2>
+				if len(d.Upcoming) == 0 {
+					<p class="muted">Nothing scheduled in the next { strconv.Itoa(d.Config.UpcomingDays) } days.</p>
+				} else {
+					<div class="agenda-columns">
+						@agenda(d.Upcoming, d.Titles, d.Today)
+					</div>
+				}
+			</section>
 		}
 	}
 }

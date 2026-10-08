@@ -14,16 +14,19 @@ embedded in the binary, so it works offline.
 - **Dashboard**: overdue actions, upcoming events, applications that need a follow-up, and pipeline
   counts with stage conversion.
 - **Applications table**: sort, filter, free-text search (company, title, notes, contacts) and a
-  "show closed" toggle. Filtered URLs can be bookmarked.
+  "show closed" toggle. Filtered URLs can be bookmarked. Change priority and status right in the
+  table; click anywhere else on a row to open it.
 - **Application page** with six section cards (Company, Job Application, Contacts, Hiring Process,
-  Compensation, Other) that you edit in place. It also has inline status/priority selects and a
+  Compensation, Other; interviews and Q&A get cards of their own) spread over as many columns as
+  fit the window, so a wide screen shows everything without scrolling. Click any field, empty
+  field name or header date to edit it in place. It also has inline status/priority selects and a
   "Contacted today" button.
 - **Repeatable entries**: recruiters, interviewers, interview rounds (Interview 1, 2, 3, …),
   questions and answers per round, and extra materials sent.
 - **Attachments**: upload the posting (PDF/HTML/MHTML) or paste its text, cover letters and
   take-home work. Each application has its own folder.
 - **CV library** with a "used in" view.
-- **Kanban board** with drag-and-drop between statuses.
+- **Kanban board** with drag-and-drop between statuses; cards show the next step.
 - **Calendar** agenda plus an `.ics` export for Outlook or Google Calendar.
 - **Export**: CSV of every application, and a ZIP backup of the whole data folder.
 
@@ -49,7 +52,8 @@ Flags:
 | `--dev` | off | Serve static files from `web/static` on disk, no caching, debug logs |
 | `--version` | | Print the version |
 
-Keyboard shortcuts: `n` starts a new application, and `/` focuses the search box.
+Keyboard shortcuts: `n` starts a new application, and `/` focuses the search box. In an edit form,
+Ctrl+Enter (Cmd+Enter on a Mac) saves and Esc cancels; Esc asks first if you changed something.
 
 ## Your data
 

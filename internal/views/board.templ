@@ -40,6 +40,9 @@ templ boardCard(b BoardData, r Row) {
 		<a href={ "/applications/" + a.ID } class="card-link">
 			<strong>{ r.Company }</strong>
 			<span>{ a.Job.Title }</span>
+			if a.Process.NextStep != "" {
+				<span class="card-next muted small">{ a.Process.NextStep }</span>
+			}
 		</a>
 		<div class="card-meta">
 			@components.PriorityPill(&b.Config, a.Priority)

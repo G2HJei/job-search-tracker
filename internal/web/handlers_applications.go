@@ -91,7 +91,6 @@ func (s *Server) listApplications(w http.ResponseWriter, r *http.Request) {
 	}
 	p := s.page("Applications", "applications")
 	p.Query = l.Q
-	p.Wide = true
 	s.render(w, r, http.StatusOK, views.ApplicationsPage(p, l))
 }
 
@@ -568,7 +567,7 @@ func (s *Server) touch(w http.ResponseWriter, r *http.Request) {
 
 // quickUpdate applies a one-click change and answers according to where it
 // came from (the "ctx" field): the detail header, the decision suggestion,
-// the dashboard or the board.
+// an applications table row, the dashboard or the board.
 func (s *Server) quickUpdate(w http.ResponseWriter, r *http.Request, msg string, fn func(a *model.Application) error) {
 	id := r.PathValue("id")
 	before, ok := s.store.GetApplication(id)
@@ -597,6 +596,8 @@ func (s *Server) quickUpdate(w http.ResponseWriter, r *http.Request, msg string,
 	case "suggest":
 		d := s.detailData(after)
 		s.render(w, r, http.StatusOK, sections.View("process", d.Base), views.DetailHeader(d, true))
+	case "row":
+		s.render(w, r, http.StatusOK, views.ApplicationRow(s.store.Config(), s.rows([]model.Application{after})[0], s.today()))
 	case "dashboard":
 		w.WriteHeader(http.StatusOK) // empty body: the item is removed
 	default:

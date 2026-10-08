@@ -14,13 +14,16 @@ import (
 // always reloads pages on back/forward so data is never stale.
 const htmxConfig = `{"responseHandling":[{"code":"204","swap":false},{"code":"[23]..","swap":true},{"code":"422","swap":true},{"code":"409","swap":true},{"code":"[45]..","swap":false,"error":true}],"includeIndicatorStyles":false,"allowEval":false,"historyCacheSize":0,"refreshOnHistoryMiss":true}`
 
+// homage explains the name; it is the wordmark's tooltip and is on the
+// settings page.
+const homage = "Named for Jedediah Smith (1799–1831), trapper and pathfinder of the American West."
+
 // Page holds what the layout needs.
 type Page struct {
 	Title      string
 	Nav        string // active nav item
 	Version    string // appended to asset URLs to bust caches
 	Query      string // global search box value
-	Wide       bool   // use the full window width
 	Board      bool   // load SortableJS
 	LoadErrors int
 	Warnings   []string

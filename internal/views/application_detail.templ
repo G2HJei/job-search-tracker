@@ -15,81 +15,51 @@ templ DetailPage(p Page, d DetailData) {
 				}
 			</div>
 		}
-		<div class="sections">
-			for _, name := range sections.Names {
-				if name == d.EditName {
-					@sections.Edit(name, d.EditData)
-				} else {
-					@sections.View(name, d.Base)
-				}
+		<div class="card-columns" data-columns>
+			for _, name := range detailCards {
+				@sectionCard(d, name)
 			}
+			@attachments(d)
 		</div>
-		@attachments(d)
-		<section class="danger-zone">
-			<form method="post" action={ appURL(d) + "/delete" } data-confirm="Move this application to the trash? Its folder is moved to data/.trash and can be restored by hand.">
-				<button type="submit" class="secondary outline small">Delete application</button>
-			</form>
-		</section>
 	}
 }
 
-// DetailHeader shows the title, inline priority/status selects and key
-// dates. Status and priority changes re-render it.
+templ sectionCard(d DetailData, name string) {
+	if name == d.EditName {
+		@sections.Edit(name, d.EditData)
+		@sections.Parts(name, d.Base)
+	} else {
+		@sections.View(name, d.Base)
+	}
+}
+
+// DetailHeader is one row: title, key dates, then the priority/status
+// selects and actions. Status and priority changes re-render it.
 templ DetailHeader(d DetailData, oob bool) {
 	{{ a := d.Base.App }}
 	{{ cfg := d.Base.Config }}
 	<header id="app-header" class="app-header" { oobAttr(oob)... }>
-		<div class="title-row">
-			<hgroup>
-				<h1>{ a.Job.Title }</h1>
-				<p>
-					if d.Base.CompanyFound {
-						<a href={ "/companies/" + a.CompanyID }>{ d.Base.Company.Name }</a>
-					} else {
-						<span class="unknown-value">{ a.CompanyID }</span>
-					}
-					if a.Job.Location != "" {
-						<span class="muted">· { a.Job.Location }</span>
-					}
-					if a.Job.PostingURL != "" {
-						· @components.ExtLink(a.Job.PostingURL, "Job posting ↗")
-					}
-				</p>
-			</hgroup>
-			<div class="quick-controls">
-				<form method="post" action={ appURL(d) + "/priority" } class="inline-form">
-					<input type="hidden" name="ctx" value="detail"/>
-					<label>
-						<span class="small muted">Priority</span>
-						@components.SelectOnly("priority", a.Priority, components.Priorities(&cfg), "", templ.Attributes{
-							"hx-post": appURL(d) + "/priority", "hx-trigger": "change", "hx-target": "#app-header", "hx-swap": "outerHTML",
-							"class": "pill-select color-" + priorityColor(cfg, a.Priority),
-						})
-					</label>
-					<noscript><button type="submit" class="small">Set</button></noscript>
-				</form>
-				<form method="post" action={ appURL(d) + "/status" } class="inline-form">
-					<input type="hidden" name="ctx" value="detail"/>
-					<label>
-						<span class="small muted">Status</span>
-						@components.SelectOnly("status", a.Status, components.Statuses(&cfg), "", templ.Attributes{
-							"hx-post": appURL(d) + "/status", "hx-trigger": "change", "hx-target": "#app-header", "hx-swap": "outerHTML",
-							"class": "pill-select status-" + a.Status,
-						})
-					</label>
-					<noscript><button type="submit" class="small">Set</button></noscript>
-				</form>
-				<form method="post" action={ appURL(d) + "/touch" } hx-post={ appURL(d) + "/touch" } hx-target="#app-header" hx-swap="outerHTML" class="inline-form">
-					<input type="hidden" name="ctx" value="detail"/>
-					<button type="submit" class="outline small" title="Set last contact date to today">Contacted today</button>
-				</form>
-			</div>
-		</div>
+		<hgroup>
+			<h1>{ a.Job.Title }</h1>
+			<p>
+				if d.Base.CompanyFound {
+					<a href={ "/companies/" + a.CompanyID }>{ d.Base.Company.Name }</a>
+				} else {
+					<span class="unknown-value">{ a.CompanyID }</span>
+				}
+				if a.Job.Location != "" {
+					<span class="muted">· { a.Job.Location }</span>
+				}
+				if a.Job.PostingURL != "" {
+					· @components.ExtLink(a.Job.PostingURL, "Job posting ↗")
+				}
+			</p>
+		</hgroup>
 		{{ dates := keyDates(d) }}
 		if len(dates) > 0 {
 			<ul class="key-dates">
 				for _, k := range dates {
-					<li class={ templ.KV("overdue", k.Overdue) }>
+					<li class={ templ.KV("overdue", k.Overdue) } data-edit-section={ k.Section } data-edit-field={ k.Field } title="Click to edit">
 						<span class="small muted">{ k.Label }</span>
 						<strong>{ k.Value }</strong>
 						if k.Note != "" {
@@ -99,6 +69,37 @@ templ DetailHeader(d DetailData, oob bool) {
 				}
 			</ul>
 		}
+		<div class="quick-controls">
+			<form method="post" action={ appURL(d) + "/priority" } class="inline-form">
+				<input type="hidden" name="ctx" value="detail"/>
+				<label>
+					<span class="small muted">Priority</span>
+					@components.SelectOnly("priority", a.Priority, components.Priorities(&cfg), "", templ.Attributes{
+						"hx-post": appURL(d) + "/priority", "hx-trigger": "change", "hx-target": "#app-header", "hx-swap": "outerHTML",
+						"class": "pill-select color-" + priorityColor(cfg, a.Priority),
+					})
+				</label>
+				<noscript><button type="submit" class="small">Set</button></noscript>
+			</form>
+			<form method="post" action={ appURL(d) + "/status" } class="inline-form">
+				<input type="hidden" name="ctx" value="detail"/>
+				<label>
+					<span class="small muted">Status</span>
+					@components.SelectOnly("status", a.Status, components.Statuses(&cfg), "", templ.Attributes{
+						"hx-post": appURL(d) + "/status", "hx-trigger": "change", "hx-target": "#app-header", "hx-swap": "outerHTML",
+						"class": "pill-select status-" + a.Status,
+					})
+				</label>
+				<noscript><button type="submit" class="small">Set</button></noscript>
+			</form>
+			<form method="post" action={ appURL(d) + "/touch" } hx-post={ appURL(d) + "/touch" } hx-target="#app-header" hx-swap="outerHTML" class="inline-form">
+				<input type="hidden" name="ctx" value="detail"/>
+				<button type="submit" class="outline small" title="Set last contact date to today">Contacted today</button>
+			</form>
+			<form method="post" action={ appURL(d) + "/delete" } class="inline-form" data-confirm="Move this application to the trash? Its folder is moved to data/.trash and can be restored by hand.">
+				<button type="submit" class="secondary outline small">Delete</button>
+			</form>
+		</div>
 	</header>
 }
 
@@ -143,29 +144,22 @@ templ attachments(d DetailData) {
 				@components.Markdown(d.PostingText)
 			</details>
 		}
-		<div class="grid upload-forms">
-			<form method="post" action={ appURL(d) + "/files" } enctype="multipart/form-data">
-				<label>
-					Upload a file <span class="muted small">(max 25 MB)</span>
-					<input type="file" name="file" required/>
-				</label>
-				<label>
-					Use as
-					<select name="purpose">
-						<option value="">Attachment</option>
-						<option value="posting">Saved posting copy (PDF/HTML/MHTML)</option>
-						<option value="material">Extra material sent (e.g. cover letter)</option>
-					</select>
-				</label>
-				<button type="submit" class="secondary">Upload</button>
-			</form>
+		<form method="post" action={ appURL(d) + "/files" } enctype="multipart/form-data" class="upload-row" data-autosubmit>
+			<select name="purpose" aria-label="Use the file as">
+				<option value="">Attachment</option>
+				<option value="posting">Saved posting copy (PDF/HTML/MHTML)</option>
+				<option value="material">Extra material sent (e.g. cover letter)</option>
+			</select>
+			<input type="file" name="file" required aria-label="File to upload (max 25 MB)"/>
+			<noscript><button type="submit" class="secondary small">Upload</button></noscript>
+		</form>
+		<p class="muted small">Uploads as soon as you pick a file (max 25 MB).</p>
+		<details class="paste-posting">
+			<summary>Paste the job posting text</summary>
 			<form method="post" action={ appURL(d) + "/posting-text" }>
-				<label>
-					Or paste the job posting text <span class="muted small">(saved as posting.md)</span>
-					<textarea name="text" rows="6" placeholder="Paste the job ad here…" required></textarea>
-				</label>
-				<button type="submit" class="secondary">Save posting text</button>
+				<textarea name="text" rows="6" placeholder="Paste the job ad here…" required aria-label="Job posting text (saved as posting.md)"></textarea>
+				<button type="submit" class="secondary small">Save as posting.md</button>
 			</form>
-		</div>
+		</details>
 	</article>
 }

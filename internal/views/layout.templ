@@ -24,7 +24,7 @@ templ Layout(p Page) {
 			<header class="topbar">
 				<nav class="container-fluid">
 					<ul>
-						<li><a href="/" class="brand">Jedediah</a></li>
+						<li><a href="/" class="brand" title={ homage }>Jedediah</a></li>
 					</ul>
 					<ul class="nav-links">
 						@navLink(p, "dashboard", "/", "Dashboard")
@@ -45,15 +45,12 @@ templ Layout(p Page) {
 					</ul>
 				</nav>
 			</header>
-			<main class={ templ.KV("container", !p.Wide), templ.KV("container-fluid", p.Wide) } id="main">
+			<main class="container-fluid" id="main">
 				if p.LoadErrors > 0 || len(p.Warnings) > 0 {
 					@problemBanner(p)
 				}
 				{ children... }
 			</main>
-			<footer class="site-foot">
-				<p>Named for Jedediah Smith (1799–1831), trapper and pathfinder of the American West.</p>
-			</footer>
 			<div id="toasts" aria-live="polite"></div>
 		</body>
 	</html>

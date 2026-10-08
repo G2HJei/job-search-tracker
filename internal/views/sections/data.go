@@ -143,27 +143,31 @@ type RoundOption struct {
 	Label string
 }
 
-// field is one row in a view card.
+// field is one row in a view card. Name is the edit form input that
+// clicking the row focuses.
 type field struct {
 	Label string
+	Name  string
 	Value templ.Component
 }
 
-// fields collects non-empty rows and the labels of empty ones.
+// fields collects non-empty rows and the empty ones (shown as "Not set").
 type fields struct {
 	rows  []field
-	empty []string
+	empty []field
 }
 
-func (f *fields) add(label string, empty bool, value templ.Component) {
+func (f *fields) add(label, name string, empty bool, value templ.Component) {
 	if empty {
-		f.empty = append(f.empty, label)
+		f.empty = append(f.empty, field{Label: label, Name: name})
 		return
 	}
-	f.rows = append(f.rows, field{label, value})
+	f.rows = append(f.rows, field{label, name, value})
 }
 
-func (f *fields) text(label, s string) { f.add(label, s == "", templ.Raw(templ.EscapeString(s))) }
+func (f *fields) text(label, name, s string) {
+	f.add(label, name, s == "", templ.Raw(templ.EscapeString(s)))
+}
 
 func itoa(n int) string { return strconv.Itoa(n) }
 

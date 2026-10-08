@@ -74,47 +74,51 @@ templ CompanyPage(p Page, d CompanyData) {
 			</hgroup>
 			<a href={ "/companies/" + c.ID + "/edit" } role="button" class="secondary outline">Edit</a>
 		</div>
-		<article>
-			<dl class="fields">
-				<dt>Company size</dt>
-				<dd>
-					if c.Size != "" {
-						@components.Value(c.Size, d.Config.CompanySizes)
-					} else {
-						<span class="muted">–</span>
-					}
-				</dd>
-				<dt>Website</dt>
-				<dd>
-					if c.Website != "" {
-						@components.ExtLink(c.Website, c.Website)
-					} else {
-						<span class="muted">–</span>
-					}
-				</dd>
-				if c.Notes != "" {
-					<dt>Notes</dt>
+		<div class="side-by-side">
+			<article>
+				<dl class="fields">
+					<dt>Company size</dt>
 					<dd>
-						@components.Markdown(c.Notes)
+						if c.Size != "" {
+							@components.Value(c.Size, d.Config.CompanySizes)
+						} else {
+							<span class="muted">–</span>
+						}
 					</dd>
+					<dt>Website</dt>
+					<dd>
+						if c.Website != "" {
+							@components.ExtLink(c.Website, c.Website)
+						} else {
+							<span class="muted">–</span>
+						}
+					</dd>
+					if c.Notes != "" {
+						<dt>Notes</dt>
+						<dd>
+							@components.Markdown(c.Notes)
+						</dd>
+					}
+				</dl>
+			</article>
+			<section>
+				<div class="page-head">
+					<h2>Applications</h2>
+					<a href={ "/applications/new?company=" + queryEscape(c.Name) } role="button" class="secondary outline small">+ New application here</a>
+				</div>
+				if len(d.Rows) == 0 {
+					<p class="muted">No applications to this company yet.</p>
+				} else {
+					@RowsTable(d.Config, d.Rows, d.Today)
 				}
-			</dl>
-		</article>
-		<div class="page-head">
-			<h2>Applications</h2>
-			<a href={ "/applications/new?company=" + queryEscape(c.Name) } role="button" class="secondary outline small">+ New application here</a>
+			</section>
 		</div>
-		if len(d.Rows) == 0 {
-			<p class="muted">No applications to this company yet.</p>
-		} else {
-			@RowsTable(d.Config, d.Rows, d.Today)
-		}
 	}
 }
 
 templ CompanyFormPage(p Page, d CompanyFormData) {
 	@Layout(p) {
-		<article class="narrow">
+		<article>
 			<header>
 				if d.New {
 					<h1>New company</h1>

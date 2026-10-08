@@ -315,6 +315,18 @@ func TestConflictDetected(t *testing.T) {
 	expect(t, a.get("/applications/"+appID, false), 200, "Edited by hand")
 }
 
+// Interviews and Q&A are shown in cards of their own. They stay in the page
+// while empty (hidden) and come back out of band when the process is saved.
+func TestProcessPartCards(t *testing.T) {
+	a := newTestApp(t, false)
+	a.create()
+	expect(t, a.get("/applications/"+appID, false), 200, "data-columns",
+		`id="section-process-qa" class="section" data-edit-section="process" hx-swap-oob="true" hidden`)
+	r := a.post("/applications/"+appID+"/sections/process", url.Values{"interview_date": {"2026-10-14T10:00"}, "interview_type": {"Technical"}}, true)
+	expect(t, r, 200, `id="section-process"`,
+		`id="section-process-interviews" class="section" data-edit-section="process" hx-swap-oob="true">`, "Interview 1")
+}
+
 func TestQuickActions(t *testing.T) {
 	a := newTestApp(t, false)
 	a.create()
@@ -325,7 +337,13 @@ func TestQuickActions(t *testing.T) {
 	}
 	expect(t, a.post("/applications/"+appID+"/status", url.Values{"status": {"rejected"}, "ctx": {"board"}}, true), http.StatusNoContent)
 	expect(t, a.post("/applications/"+appID+"/status", url.Values{"status": {"made-up"}}, true), http.StatusBadRequest)
-	expect(t, a.post("/applications/"+appID+"/priority", url.Values{"priority": {"low"}, "ctx": {"detail"}}, true), 200)
+	expect(t, a.post("/applications/"+appID+"/priority", url.Values{"priority": {"high"}, "ctx": {"detail"}}, true), 200)
+	// From the applications table, the row comes back re-rendered.
+	r = a.post("/applications/"+appID+"/priority", url.Values{"priority": {"low"}, "ctx": {"row"}}, true)
+	expect(t, r, 200, `<tr data-href="/applications/`+appID+`"`, `<option value="low" selected>`, "cell-select color-")
+	if strings.Contains(r.body, "<html") {
+		t.Error("row update returned a full page")
+	}
 
 	// "Contacted today" changes the process section, so it is refreshed out of band.
 	r = a.post("/applications/"+appID+"/touch", url.Values{"ctx": {"detail"}}, true)
@@ -497,6 +515,10 @@ func TestPagesWithDemoData(t *testing.T) {
 	// The deliberately unknown channel is kept and flagged.
 	expect(t, a.get("/applications/2026-08-10-fernhollow-energy-go-developer-6-month-contract", false), 200,
 		`class="unknown-value" title="Not in config.yaml">Meetup`)
+	// Fields, empty fields and header dates say which input clicking them edits.
+	expect(t, a.get("/applications/2026-08-18-larkspur-payments-senior-backend-engineer-payments-core", false), 200,
+		`<dd data-edit-field="noticePeriod">`, `href="/applications/2026-08-18-larkspur-payments-senior-backend-engineer-payments-core/sections/compensation/edit" data-edit-field="startDate">Start date</a>`,
+		`data-edit-section="process" data-edit-field="nextStep"`, `class="contact-group" data-edit-field="recruiter_name"`)
 
 	// Active applications by default; closed ones with the toggle.
 	r := a.get("/applications", false)

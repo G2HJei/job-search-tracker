@@ -21,7 +21,7 @@ templ CalendarPage(p Page, c CalendarData) {
 			if len(c.Overdue) == 0 {
 				<p class="muted">Nothing overdue.</p>
 			} else {
-				<ul class="events">
+				<ul class="events agenda-columns">
 					for _, e := range c.Overdue {
 						@eventItem(e, c.Titles, c.Today, true)
 					}
@@ -33,7 +33,9 @@ templ CalendarPage(p Page, c CalendarData) {
 			if len(c.Days) == 0 {
 				<p class="muted">Nothing scheduled.</p>
 			} else {
-				@monthAgenda(c)
+				<div class="agenda-columns">
+					@monthAgenda(c)
+				</div>
 			}
 		</section>
 	}

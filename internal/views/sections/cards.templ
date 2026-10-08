@@ -1,7 +1,5 @@
 package sections
 
-import "strings"
-
 // View renders a section's view card.
 templ View(name string, d Data) {
 	switch name {
@@ -18,6 +16,33 @@ templ View(name string, d Data) {
 		case "other":
 			@otherView(d)
 	}
+}
+
+// Parts renders the extra view cards of a section (only the hiring process
+// has them). View includes them; a page that shows the section's edit card
+// adds them separately.
+templ Parts(name string, d Data) {
+	if name == "process" {
+		@processParts(d)
+	}
+}
+
+// partCard shows part of a section in its own card, so a long section does
+// not make one very tall column. It is edited with the rest of the section:
+// app.js opens that section's form (data-edit-section). It always carries
+// hx-swap-oob, which htmx ignores on the initial page, so a response that
+// re-renders the section refreshes it wherever it is. It stays in the page
+// while empty (hidden) so that it can be filled in later.
+templ partCard(d Data, section, part, title, field string, empty bool) {
+	<article id={ sectionID(section + "-" + part) } class="section" data-edit-section={ section } hx-swap-oob="true" hidden?={ empty }>
+		<header class="section-head">
+			<h2>{ title }</h2>
+			<a href={ d.sectionURL(section) + "/edit" } data-edit-field={ field } role="button" class="outline secondary small">Edit</a>
+		</header>
+		<div data-edit-field={ field }>
+			{ children... }
+		</div>
+	</article>
 }
 
 // Edit renders a section's edit card.
@@ -82,8 +107,9 @@ templ editCard(d Data, name string, after templ.Component) {
 					hx-target={ target(name) }
 					hx-swap="outerHTML"
 					role="button"
-					class="secondary outline"
+					class="secondary outline cancel-edit"
 				>Cancel</a>
+				<span class="muted small keys">Ctrl+Enter saves, Esc cancels</span>
 			</div>
 		</form>
 		if after != nil {
@@ -92,19 +118,30 @@ templ editCard(d Data, name string, after templ.Component) {
 	</article>
 }
 
-templ fieldList(f fields) {
+// fieldList shows the set fields and lists the empty ones. Clicking a row
+// or an empty field's name opens the edit form at that field (app.js);
+// without JavaScript the names link to the edit form.
+templ fieldList(f fields, editURL string) {
 	if len(f.rows) > 0 {
 		<dl class="fields">
 			for _, r := range f.rows {
-				<dt>{ r.Label }</dt>
-				<dd>
+				<dt data-edit-field={ r.Name }>{ r.Label }</dt>
+				<dd data-edit-field={ r.Name }>
 					@r.Value
 				</dd>
 			}
 		</dl>
 	}
 	if len(f.empty) > 0 {
-		<p class="empty-fields">Not set: { strings.Join(f.empty, ", ") }</p>
+		<p class="empty-fields">
+			Not set:
+			for i, e := range f.empty {
+				if i > 0 {
+					{ ", " }
+				}
+				<a href={ editURL } data-edit-field={ e.Name }>{ e.Label }</a>
+			}
+		</p>
 	}
 }
 

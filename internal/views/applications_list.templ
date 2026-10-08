@@ -73,7 +73,7 @@ templ ApplicationsResults(l ListData) {
 				</thead>
 				<tbody>
 					for _, r := range l.Rows {
-						@applicationRow(l.Config, r, l.Today)
+						@ApplicationRow(l.Config, r, l.Today)
 					}
 				</tbody>
 			</table>
@@ -87,14 +87,16 @@ templ sortHeader(l ListData, col, label string) {
 	</th>
 }
 
-templ applicationRow(cfg model.Config, r Row, today model.Date) {
+// ApplicationRow is one table row. Clicking the row opens the application
+// (app.js); priority and status change in place and re-render the row.
+templ ApplicationRow(cfg model.Config, r Row, today model.Date) {
 	{{ a := r.App }}
-	<tr>
+	<tr data-href={ "/applications/" + a.ID }>
 		<td>
-			@components.PriorityPill(&cfg, a.Priority)
+			@rowSelect(a.ID, "priority", "Priority", a.Priority, components.Priorities(&cfg), "color-"+priorityColor(cfg, a.Priority))
 		</td>
 		<td>
-			@components.StatusPill(&cfg, a.Status)
+			@rowSelect(a.ID, "status", "Status", a.Status, components.Statuses(&cfg), "status-"+a.Status)
 		</td>
 		<td>
 			@companyName(r)
@@ -112,6 +114,21 @@ templ applicationRow(cfg model.Config, r Row, today model.Date) {
 		<td class="nowrap">{ components.ShortDate(a.Process.LastContactDate, today) }</td>
 		<td class="nowrap">{ components.ShortDate(a.Process.DateApplied, today) }</td>
 	</tr>
+}
+
+// rowSelect is a pill-styled select that saves on change. field is
+// "priority" or "status", which is also the endpoint.
+templ rowSelect(id, field, label, value string, opts []components.Option, color string) {
+	{{ action := "/applications/" + id + "/" + field }}
+	<form method="post" action={ action } class="inline-form">
+		<input type="hidden" name="ctx" value="row"/>
+		<input type="hidden" name="return" value="/applications"/>
+		@components.SelectOnly(field, value, opts, "", templ.Attributes{
+			"hx-post": action, "hx-trigger": "change", "hx-target": "closest tr", "hx-swap": "outerHTML",
+			"class": "cell-select " + color, "aria-label": label,
+		})
+		<noscript><button type="submit" class="small">Set</button></noscript>
+	</form>
 }
 
 templ companyName(r Row) {
@@ -158,24 +175,24 @@ templ RowsTable(cfg model.Config, rows []Row, today model.Date) {
 
 templ NewApplicationPage(p Page, d NewAppData) {
 	@Layout(p) {
-		<article class="narrow">
+		<article>
 			<header><h1>New application</h1></header>
 			<form method="post" action="/applications">
 				if len(d.Errors) > 0 {
 					<p class="form-error" role="alert">Please fix the highlighted fields.</p>
 				}
-				@components.Input("Company", "text", "company", d.Company, d.Errors.Get("company"), templ.Attributes{"list": "companies-list", "required": true, "autofocus": true, "autocomplete": "off", "placeholder": "Existing or new company"})
+				<div class="form-row">
+					@components.Input("Company", "text", "company", d.Company, d.Errors.Get("company"), templ.Attributes{"list": "companies-list", "required": true, "autofocus": true, "autocomplete": "off", "placeholder": "Existing or new company"})
+					@components.Input("Job title", "text", "title", d.Title, d.Errors.Get("title"), templ.Attributes{"required": true})
+					@components.Input("Job posting link", "url", "postingUrl", d.PostingURL, d.Errors.Get("postingUrl"), templ.Attributes{"placeholder": "https://"})
+					@components.Select("Priority", "priority", d.Priority, components.Priorities(&d.Config), d.Errors.Get("priority"), "")
+					@components.Select("Status", "status", d.Status, components.Statuses(&d.Config), d.Errors.Get("status"), "")
+				</div>
 				<datalist id="companies-list">
 					for _, c := range d.Companies {
 						<option value={ c.Name }></option>
 					}
 				</datalist>
-				@components.Input("Job title", "text", "title", d.Title, d.Errors.Get("title"), templ.Attributes{"required": true})
-				@components.Input("Job posting link", "url", "postingUrl", d.PostingURL, d.Errors.Get("postingUrl"), templ.Attributes{"placeholder": "https://"})
-				<div class="grid">
-					@components.Select("Priority", "priority", d.Priority, components.Priorities(&d.Config), d.Errors.Get("priority"), "")
-					@components.Select("Status", "status", d.Status, components.Statuses(&d.Config), d.Errors.Get("status"), "")
-				</div>
 				<button type="submit">Create and open</button>
 			</form>
 			<footer class="muted small">Fill in everything else on the application page.</footer>
