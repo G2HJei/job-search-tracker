@@ -35,10 +35,11 @@ templ Value(value string, options []string) {
 	}
 }
 
-// Rating shows 1–5 stars, or a dash when unset.
+// Rating shows 1–5 stars, empty ones greyed out, or a dash when unset.
 templ Rating(n int) {
 	if n > 0 {
-		<span class="rating" title={ strconv.Itoa(n) + " of 5" } aria-label={ strconv.Itoa(n) + " of 5" }>{ Stars(n) }</span>
+		{{ filled, empty := Stars(n) }}
+		<span class="rating" title={ strconv.Itoa(n) + " of 5" } aria-label={ strconv.Itoa(n) + " of 5" }>{ filled }<span class="rating-empty">{ empty }</span></span>
 	} else {
 		<span class="muted">–</span>
 	}

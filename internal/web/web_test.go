@@ -167,7 +167,7 @@ func TestCreateEditEverySection(t *testing.T) {
 			"cvVersion": {"cv-v3.pdf"}, "material": {"cover-letter.pdf", "", "https://github.com/me"},
 			"advertisedSalary_min": {"80,000"}, "advertisedSalary_max": {"95000"}, "advertisedSalary_currency": {"gbp"},
 			"advertisedSalary_period": {"year"}, "advertisedSalary_note": {""}},
-			[]string{"Senior Backend Engineer", "★★★★☆", "£80,000–95,000 / year", "<li>Postgres</li>"},
+			[]string{"Senior Backend Engineer", `★★★★<span class="rating-empty">☆</span>`, "£80,000–95,000 / year", "<li>Postgres</li>"},
 			[]string{"title: Senior Backend Engineer", "keyRequirements: |\n    - Go\n    - Postgres\n",
 				"advertisedSalary: {min: 80000, max: 95000, currency: GBP, period: year}",
 				"extraMaterials:\n    - cover-letter.pdf\n    - https://github.com/me\n"}},

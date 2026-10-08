@@ -95,10 +95,10 @@ func Invalid(err string) templ.Attributes {
 	return templ.Attributes{"aria-invalid": "true"}
 }
 
-// Stars renders a 1–5 rating as ★★★☆☆.
-func Stars(n int) string {
+// Stars renders a 1–5 rating as filled and empty stars: ★★★ and ☆☆.
+func Stars(n int) (filled, empty string) {
 	n = max(0, min(5, n))
-	return strings.Repeat("★", n) + strings.Repeat("☆", 5-n)
+	return strings.Repeat("★", n), strings.Repeat("☆", 5-n)
 }
 
 func ratingLabel(i int) string {

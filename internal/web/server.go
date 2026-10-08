@@ -3,6 +3,8 @@
 package web
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io/fs"
 	"log/slog"
@@ -23,7 +25,7 @@ type Options struct {
 	Store   *store.Store
 	Static  fs.FS  // contents of web/static
 	Dev     bool   // no caching of static files
-	Version string // shown in settings and used to bust asset caches
+	Version string // shown in settings
 	Addr    string // listen address; its host is added to the Host allowlist
 	Logger  *slog.Logger
 	Now     func() time.Time
@@ -67,11 +69,30 @@ func New(o Options) *Server {
 			s.hosts[strings.ToLower(host)] = true
 		}
 	}
-	s.assetVer = s.version
-	if s.dev || s.assetVer == "" {
-		s.assetVer = fmt.Sprint(time.Now().Unix())
-	}
+	s.assetVer = contentVersion(s.static)
 	return s
+}
+
+// contentVersion hashes every static file, so asset URLs change whenever an
+// asset does, even between builds sharing a version string (go run is "dev").
+func contentVersion(fsys fs.FS) string {
+	if fsys == nil {
+		return fmt.Sprint(time.Now().Unix())
+	}
+	h := sha256.New()
+	err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		b, err := fs.ReadFile(fsys, path)
+		fmt.Fprintf(h, "%s\x00%d\x00", path, len(b))
+		h.Write(b)
+		return err
+	})
+	if err != nil {
+		return fmt.Sprint(time.Now().Unix())
+	}
+	return hex.EncodeToString(h.Sum(nil))[:12]
 }
 
 // Handler returns the full handler chain.

@@ -134,7 +134,6 @@ h3, h4 { font-weight: 600; }
 .nav-search { margin: 0; }
 .nav-search input { margin: 0; width: 13rem; height: 2rem; padding-block: 0; }
 .topbar .nav-search input { background-color: var(--hover); border-color: var(--line); }
-.new-btn { white-space: nowrap; padding: .3rem .75rem; }
 
 .page-head {
   display: flex; align-items: baseline; justify-content: space-between;
@@ -215,6 +214,7 @@ a + .pill, .pill + .pill, span + .pill { margin-left: .4rem; }
 .unknown-value { text-decoration: underline wavy var(--c-amber); text-underline-offset: .2em; cursor: help; }
 
 .rating { color: var(--c-amber); letter-spacing: .05em; white-space: nowrap; }
+.rating-empty { color: color-mix(in srgb, var(--dust) 50%, transparent); }
 .rating-input { display: flex; gap: .75rem; flex-wrap: wrap; align-items: center; }
 .rating-input legend { width: 100%; }
 .rating-input label { display: inline-flex; gap: .25rem; align-items: center; margin: 0; }
