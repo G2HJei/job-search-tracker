@@ -31,27 +31,12 @@
     toast("Could not reach the app. Is it still running?", true);
   });
 
-  // ---- Clicks: remove a repeatable row, fill a date with today, edit a
-  // field, open a table row ----
-  function localToday() {
-    var d = new Date();
-    var pad = function (n) { return String(n).padStart(2, "0"); };
-    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
-  }
-
+  // ---- Clicks: remove a repeatable row, edit a field, open a table row ----
   document.addEventListener("click", function (e) {
     var remove = e.target.closest("[data-remove-row]");
     if (remove) {
       var row = remove.closest("[data-row]");
       if (row) row.remove();
-      return;
-    }
-    var today = e.target.closest("[data-today]");
-    if (today) {
-      e.preventDefault();
-      var form = today.closest("form");
-      var input = form && form.querySelector('input[name="' + CSS.escape(today.dataset.today) + '"]');
-      if (input) input.value = localToday();
       return;
     }
     var spot = e.target.closest("[data-edit-field]");

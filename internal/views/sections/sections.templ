@@ -223,11 +223,11 @@ templ processEdit(d Data) {
 		{{ p := d.App.Process }}
 		<div class="grid">
 			@components.Input("Next step", "text", "nextStep", p.NextStep, "", nil)
-			@components.DateInput("Next step date", "nextStepDate", p.NextStepDate, d.err("process.nextStepDate"), false)
+			@components.DateInput("Next step date", "nextStepDate", p.NextStepDate, d.err("process.nextStepDate"))
 		</div>
 		<div class="grid">
-			@components.DateInput("Last contact date", "lastContactDate", p.LastContactDate, d.err("process.lastContactDate"), true)
-			@components.DateInput("Date applied", "dateApplied", p.DateApplied, d.err("process.dateApplied"), false)
+			@components.DateInput("Last contact date", "lastContactDate", p.LastContactDate, d.err("process.lastContactDate"))
+			@components.DateInput("Date applied", "dateApplied", p.DateApplied, d.err("process.dateApplied"))
 			@components.DateTimeInput("Screening date", "screeningDate", p.ScreeningDate, d.err("process.screeningDate"))
 		</div>
 		<fieldset>
@@ -241,9 +241,9 @@ templ processEdit(d Data) {
 			@datalist("interviewer-names", d.interviewerNames())
 		</fieldset>
 		<div class="grid">
-			@components.DateInput("Follow-up date", "followUpDate", p.FollowUpDate, d.err("process.followUpDate"), false)
-			@components.DateInput("Offer date", "offerDate", p.OfferDate, d.err("process.offerDate"), false)
-			@components.DateInput("Offer response deadline", "offerResponseDeadline", p.OfferResponseDeadline, d.err("process.offerResponseDeadline"), false)
+			@components.DateInput("Follow-up date", "followUpDate", p.FollowUpDate, d.err("process.followUpDate"))
+			@components.DateInput("Offer date", "offerDate", p.OfferDate, d.err("process.offerDate"))
+			@components.DateInput("Offer response deadline", "offerResponseDeadline", p.OfferResponseDeadline, d.err("process.offerResponseDeadline"))
 		</div>
 		<fieldset>
 			<legend>Questions asked / answers</legend>
@@ -322,7 +322,7 @@ templ compensationEdit(d Data) {
 		@components.TextArea("Benefits (Markdown)", "benefits", c.Benefits, "", 3)
 		<div class="grid">
 			@components.Input("Notice period", "text", "noticePeriod", c.NoticePeriod, "", templ.Attributes{"placeholder": "e.g. 1 month"})
-			@components.DateInput("Start date", "startDate", c.StartDate, d.err("compensation.startDate"), false)
+			@components.DateInput("Start date", "startDate", c.StartDate, d.err("compensation.startDate"))
 		</div>
 	}
 }

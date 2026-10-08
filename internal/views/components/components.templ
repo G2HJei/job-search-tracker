@@ -106,17 +106,10 @@ templ RatingInput(label, name string, value int, err string) {
 	</fieldset>
 }
 
-templ DateInput(label, name string, v model.Date, err string, todayButton bool) {
+templ DateInput(label, name string, v model.Date, err string) {
 	<label>
 		{ label }
-		if todayButton {
-			<span role="group" class="with-button">
-				<input type="date" name={ name } value={ v.FormValue() } { Invalid(err)... }/>
-				<button type="button" class="secondary" data-today={ name }>Today</button>
-			</span>
-		} else {
-			<input type="date" name={ name } value={ v.FormValue() } { Invalid(err)... }/>
-		}
+		<input type="date" name={ name } value={ v.FormValue() } { Invalid(err)... }/>
 		@ErrorText(err)
 	</label>
 }

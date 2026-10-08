@@ -388,8 +388,6 @@ details.qa summary { font-weight: 600; }
 
 .form-actions { display: flex; gap: .75rem; margin-top: .5rem; }
 .form-actions > * { margin: 0; width: auto; }
-.with-button { display: flex; }
-.with-button input { margin-bottom: 0; }
 .salary-grid { display: grid; grid-template-columns: 1fr 1fr 4.5rem 6.5rem; gap: .5rem; }
 .section .grid:has(> fieldset.salary) { grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr)); }
 .salary-grid > * { margin-bottom: .5rem; }

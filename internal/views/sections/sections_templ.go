@@ -1096,7 +1096,7 @@ func processEdit(d Data) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = components.DateInput("Next step date", "nextStepDate", p.NextStepDate, d.err("process.nextStepDate"), false).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.DateInput("Next step date", "nextStepDate", p.NextStepDate, d.err("process.nextStepDate")).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1104,11 +1104,11 @@ func processEdit(d Data) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = components.DateInput("Last contact date", "lastContactDate", p.LastContactDate, d.err("process.lastContactDate"), true).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.DateInput("Last contact date", "lastContactDate", p.LastContactDate, d.err("process.lastContactDate")).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = components.DateInput("Date applied", "dateApplied", p.DateApplied, d.err("process.dateApplied"), false).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.DateInput("Date applied", "dateApplied", p.DateApplied, d.err("process.dateApplied")).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1142,15 +1142,15 @@ func processEdit(d Data) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = components.DateInput("Follow-up date", "followUpDate", p.FollowUpDate, d.err("process.followUpDate"), false).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.DateInput("Follow-up date", "followUpDate", p.FollowUpDate, d.err("process.followUpDate")).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = components.DateInput("Offer date", "offerDate", p.OfferDate, d.err("process.offerDate"), false).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.DateInput("Offer date", "offerDate", p.OfferDate, d.err("process.offerDate")).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = components.DateInput("Offer response deadline", "offerResponseDeadline", p.OfferResponseDeadline, d.err("process.offerResponseDeadline"), false).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.DateInput("Offer response deadline", "offerResponseDeadline", p.OfferResponseDeadline, d.err("process.offerResponseDeadline")).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1491,7 +1491,7 @@ func compensationEdit(d Data) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = components.DateInput("Start date", "startDate", c.StartDate, d.err("compensation.startDate"), false).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = components.DateInput("Start date", "startDate", c.StartDate, d.err("compensation.startDate")).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
